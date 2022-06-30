@@ -1,0 +1,75 @@
+{% extends 'user_login/company_base.html' %}
+{% load static %}
+{% block title %}Show Applicants{% endblock title %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-2"></div>
+        <div class="col-md-8">
+            <div>
+                <h2>Applicants</h2>
+            </div>
+            {% for applicant in applicants %}
+            <div class="card border-dark" style="margin:10px;">
+                <div class="card-header border-dark">
+                    <div>
+                        <h5><span>Applied for : </span><b>{{ applicant.job_role }}</b></h5>
+                    </div>
+                </div>
+                <p></p>
+                <div id="status_{{ applicant.id }}">
+                    <span class="alert {{ applicant.alert_class }}" role="alert" style="margin-left:5px;">Status : <b>{{ applicant.status }}</b></span>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title"><span>Name : <b>{{ applicant.name }}</b></span><br></h5>
+                    <div>
+                        <div class='card-body'>
+                            <label>Description : </label>
+                            <li class="card-text" style="margin-left:20px;"><span>Email : </span><b>{{ applicant.email }}</b></li>
+                            <li class="card-text" style="margin-left:20px;"><span>Phone Number : </span><b>{{ applicant.user_phone }}</b></li>
+                            <li class="card-text" style="margin-left:20px;"><span>12th Marks : </span><b>{{ applicant.user_12th_marks }}</b></li>
+                            <li class="card-text" style="margin-left:20px;"><span>10th Marks : </span><b>{{ applicant.user_10th_marks }}</b></li>
+                            <li class="card-text" style="margin-left:20px;"><span>CPI : </span><b>{{ applicant.user_CPI }}</b></li>
+                            <li class="card-text" style="margin-left:20px;"><span>Technology : </span><b>{{ applicant.user_technology }}</b></li>
+                        </div>
+                    </div>
+                    <div>
+                        <a href="{{ applicant.user_CV.url }}" download class="btn btn-info">Download CV </a>
+                    </div>
+                    <hr>
+                    {% if applicant.application_status == 'Pending' %}
+                    {% csrf_token %}
+                    <div>
+                        <button type="button" data-userjob_id="{{ applicant.id }}" data-status="0" class="btn btn-outline-success cv_status accept_status_{{ applicant.id }}">
+                            Accept
+                        </button>
+                        <button type="button" data-userjob_id="{{ applicant.id }}" data-status="1" class="btn btn-outline-danger cv_status reject_status_{{ applicant.id }}">Reject
+                        </button>
+                    </div>
+                    {% elif applicant.application_status == 'Accepted' %}
+                    <div>
+                        {% csrf_token %}
+                        <button type="button" data-userjob_id="{{ applicant.id }}" data-status="1" class="btn btn-outline-danger cv_status reject_status_{{ applicant.id }}">
+                            Reject
+                        </button>
+                    </div>
+                    {% elif applicant.application_status == 'Rejected' %}
+                    <div>
+                        {% csrf_token %}
+                        <button type="button" data-userjob_id="{{ applicant.id }}" data-status="0" class="btn btn-outline-success cv_status reject_status_{{ applicant.id }}">
+                            Accept
+                        </button>
+                    </div>
+                    {% endif %}
+                    <div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock content %}
+{% block jquery %}
+<script src="{% static 'user_login/js/opening_accept_reject.js' %}"></script>
+{% endblock jquery %}

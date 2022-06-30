@@ -1,0 +1,54 @@
+{% extends 'user_login/user_base.html' %}
+{% load static %}
+{% block title %}User Feedback{% endblock title %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-2"></div>
+        <div class="col-md-8">
+            <div>
+                <h2>Reschedule Form</h2>
+            </div>
+            <hr>
+            <div>
+                <form method="post">
+                    {% csrf_token %}
+                    <div>
+                        <span>Username : <b>{{ user.username }}</b></span>
+                    </div>
+                    <p></p>
+                    <p></p>
+                    <div>
+                        <span>Application ID : <b name="id_application">{{ application }}</b></span>
+                    </div>
+                    <p></p>
+                    <p></p>
+                    <div>
+                        <span>Type of Interview : </span>
+                        <span>
+                            <select name="reschedule_type" id="id_reschedule_type">
+                                <option>-----</option>
+                                <option value="1">HR</option>
+                                <option value="2">Technical</option>
+                                <option value="3">Other</option>
+                            </select>
+                        </span>
+                    </div>
+                    <p></p>
+                    <p></p>
+                    <div>
+                        <label>Reason : </label>
+                        <span><textarea name="reschedule_reason" placeholder="Please write your reason here."></textarea></span>
+                    </div>
+                    <p></p>
+                    <p></p>
+                    <div>
+                        <input type="submit" value="Submit" class="btn btn-primary">
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="col-md-2"></div>
+    </div>
+</div>
+{% endblock content %}

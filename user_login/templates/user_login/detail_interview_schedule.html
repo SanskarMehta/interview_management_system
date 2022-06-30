@@ -1,0 +1,43 @@
+{% extends 'user_login/user_base.html' %}
+{% load static %}
+{% block title %}Interview Details{% endblock title %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-12" style="margin:10px;">
+            <h3>Interview Details</h3>
+            {% for interview in interviews %}
+                {% if interview.type_interview_id == 4 %}
+                    <div class="card" style="margin:10px;">
+                        <div class="card-header">HR Interview</div>
+                        <div class="card-body">
+                            <p>Application ID : {{ interview.application_id }}</p>
+                            <p>Interview Time :{{ interview.interview_time }}</p>
+                            <p>Interview Date : {{ interview.interview_date }}</p>
+                            <p>Interviewer : <a href="{% url 'interviewer-details' interview.interviewer_id %}">{{ interview.interviewer }}</a></p>
+                            <div>
+                                <a href="{% url 'reschedule-request' interview.application_id %}" class="btn btn-primary">Reschedule</a>
+                                <a href="{% url 'user-feedback' interview.interviewer_id %}" class="btn btn-outline-success">Feedback</a>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="card" style="margin:10px;">
+                        <div class="card-header">Technical Interview</div>
+                        <div class="card-body">
+                            <p>Application ID : {{ interview.application_id }}</p>
+                            <p>Interview Time :{{ interview.interview_time }}</p>
+                            <p>Interview Date : {{ interview.interview_date }}</p>
+                            <p>Interviewer : <a href="{% url 'interviewer-details' interview.interviewer_id %}">{{ interview.interviewer }}</a></p>
+                            <div>
+                                <a href="{% url 'reschedule-request' interview.application_id %}" class="btn btn-primary">Reschedule</a>
+                                <a href="{% url 'user-feedback' interview.interviewer_id %}" class="btn btn-outline-success">Feedback</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock content %}

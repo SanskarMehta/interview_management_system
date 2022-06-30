@@ -1,0 +1,26 @@
+{% extends 'user_login/company_base.html' %}
+{% load crispy_forms_tags %}
+{% block title %}Schedule Interview{% endblock title %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-2"></div>
+        <div class="col-md-8">
+            <div>
+                <h3>Schedule HR Interviews</h3>
+            </div>
+            <hr>
+            <div>
+                <form method="POST">
+                    {{ form|crispy }}
+                    <div>
+                        <input type="button" value="Submit" class="btn btn-success">
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="col-md-2"></div>
+    </div>
+</div>
+{% endblock content %}
+{% block jquery %}{% endblock jquery %}

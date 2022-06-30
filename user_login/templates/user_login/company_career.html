@@ -1,0 +1,46 @@
+{% extends 'user_login/company_base.html' %}
+{% load static %}
+{% block title %}Career's Page{% endblock title %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-12 my_jobs_openings">
+            <div style="margin-top:15px; margin-bottom:15px;" class="job_header">
+                <h3>Job Openings in Our Company</h3>
+            </div>
+            {% if jobs|length > 0 %}
+                {% for job in jobs %}
+                <div style="margin:10px" id="{{ job.id }}" class="jobs_openings">
+                    {% csrf_token %}
+                    <div class="card border-dark">
+                      <div class="card-body">
+                        <h3 class="card-title">
+                            {{ job.job_role }}
+                        </h3>
+                        <div>
+                            <span class='alert alert-info' style="padding:5px;  border-radius:5px;"><small><b>{{ job.company.username }}</b></small></span>
+                            <span class='alert alert-info' style="padding:5px;  border-radius:5px;"><small><b>{{ job.job_location }}</b></small></span>
+                            <div class='card-body'>
+                                <span class="job_description">Description : </span><li class="card-text" style="margin-left:20px;">{{ job.description}}</li>
+                            </div>
+                            <div>
+                                <span><a href="{% url 'update-job' job.id %}" class="btn btn-outline-primary">Update</a></span>
+                                <span><a href="javascript:void(0)" data-job_id="{{ job.id }}" class="btn btn-outline-danger remove_job">Delete</a></span>
+                            </div>
+                        </div>
+                      </div>
+                  </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div>
+                    <p class="alert alert-danger">No Jobs Found</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock content %}
+{% block jquery %}
+<script src="{% static 'user_login/js/job_delete.js' %}"></script>
+{% endblock jquery %}

@@ -1,0 +1,11 @@
+{% extends 'user_login/user_base.html' %}
+{% load static %}
+{% block title%}Interview-Management :: Successful {% endblock title%}
+{% block content %}
+<div class="alert alert-success" role="alert">
+  <h4 class="alert-heading">Well done! <span> Thank you for applying with us : {{ username }}</span></h4>
+  <p>Aww yeah, you successfully applied for the Job.We will see your response and also perform some particular action on your request.</p>
+  <hr>
+  <p class="mb-0">Whenever you need any help then just contact us on this mobile Number : 121291 .<br> Thank you so much for working with us.</p>
+</div>
+{% endblock content %}

@@ -1,0 +1,1 @@
+web: gunicorn interview_management_system.wsgi

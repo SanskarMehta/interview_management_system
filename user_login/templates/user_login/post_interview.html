@@ -1,0 +1,44 @@
+{% extends 'user_login/interviewer_base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block title %}Post Interview Process{% endblock title %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-3"></div>
+        <div class="col-md-6">
+            <h2>Post Interview Process</h2>
+            <div>
+                <form method="post">
+                    <div>
+                        <span>Examiner : <b name="interviewer">{{ interviewer }}</b></span>
+                    </div>
+                    <p></p>
+                    <div>
+                        <span>Application ID : <b name="application">{{ application.id }}</b><input type="hidden" name="application" value="{{ application.id }}"></span>
+                    </div>
+                    <p></p>
+                    <div>
+                        <span>Username : <b name="user">{{ application.job_application.user }}</b><input type="hidden" name="user" value="{{ application.job_application.user }}"></span>
+                    </div>
+                    <p></p>
+                    {% csrf_token%}
+                    {{ form|crispy }}
+                    <p></p>
+                    <div>
+                        <label>Would you like to Select ?? :</label>
+                        <select name="application_status">
+                            <option>--------</option>
+                            <option value="Accepted">Accepted</option>
+                            <option value="Rejected">Rejected</option>
+                        </select>
+                    </div>
+                    <p></p>
+                    <input type="submit" class="btn btn-outline-info" value="Submit">
+                </form>
+            </div>
+        </div>
+        <div class="col-md-3"></div>
+    </div>
+</div>
+{% endblock content %}

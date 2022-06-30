@@ -1,0 +1,47 @@
+{% extends 'user_login/company_base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block css %}
+<style type="text/css">
+    #div_id_interview_time, #interview_submit_btn {
+    display:None;
+    }
+
+</style>
+{% endblock css %}
+{% block title %}Schedule Interview{% endblock title %}
+{% block content %}
+{% load bootstrap4 %}
+{% bootstrap_css %}
+{% bootstrap_javascript jquery='full' %}
+{{ form.media }}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-2"></div>
+        <div class="col-md-8">
+            <div>
+                <h3>Schedule Technical Interviews</h3>
+            </div>
+            <hr>
+            <div>
+                <form method="POST">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <input type="hidden" value="{{ pk }}" id="applicant_id" name="applicant_id">
+                    <div>
+                        <a href="javascript:void(0)" id="get_slots">Get Available Slots</a>
+                    </div>
+                    <div id="interview_submit_btn">
+                        <input type="submit" value="Submit" class="btn btn-success">
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="col-md-2"></div>
+    </div>
+</div>
+{% endblock content %}
+{% block jquery %}
+<script src="{% static 'user_login/js/schedule_interview.js' %}"></script>
+{% endblock jquery %}

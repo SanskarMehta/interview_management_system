@@ -1,0 +1,38 @@
+{% extends 'user_login/interviewer_base.html' %}
+{% load static %}
+{% block title %}Schedule Page{% endblock title %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-2"></div>
+        <div class="col-md-8">
+            <div>
+                <h3>Interview Schedule</h3>
+            </div>
+            <div>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Application ID</th>
+                            <th>Name</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                        </tr>
+                    </thead>
+                    {% for applicant in interview_schedule %}
+                    <tbody>
+                        <tr>
+                            <td><a href="{% url 'applicant_details' applicant.application_id %}">{{ applicant.application_id }}</a></td>
+                            <td>{{ applicant.application.job_application.user.username }}</td>
+                            <td>{{ applicant.interview_date }}</td>
+                            <td>{{ applicant.interview_time }}</td>
+                        </tr>
+                    </tbody>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+        <div class="col-md-2"></div>
+    </div>
+</div>
+{% endblock content %}

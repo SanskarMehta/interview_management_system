@@ -1,0 +1,33 @@
+{% extends 'user_login/interviewer_base.html' %}
+{% block title %}Post Interview Process{% endblock title %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div>
+            <h2>Post Interview Process</h2>
+        </div>
+        <div class="col-md-4"></div>
+        <div class="col-md-8">
+            {% for interview in interviews %}
+            <div class="card" style="margin:10px;">
+                <div class="card-header">
+                    <h5>Application ID: {{ interview.application_id }}</h5>
+                </div>
+                <div class="card-body">
+                    <p>Name : {{ interview.application.job_application.user }}</p>
+                    <hr>
+                    <p>Job Role : {{ interview.application.job_application.job.job_role }}</p>
+                    <hr>
+                    <p>Description : {{ interview.application.job_application.job.description }}</p>
+                    <hr>
+                    <p>Job Location : {{ interview.application.job_application.job.job_location }}</p>
+                    <hr>
+                    <p></p>
+                    <a href="{% url 'post-interview' interview.application_id %}" class="btn btn-outline-info">Evaluation</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock content %}

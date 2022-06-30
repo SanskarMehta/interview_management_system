@@ -1,0 +1,40 @@
+{% extends 'user_login/company_base.html' %}
+{% block title %}Job Openings{% endblock title%}
+{% block content %}
+<div class="'container">
+    <div class="row">
+        <div class="col-md-3"></div>
+        <div class="col-md-6">
+            <div>
+                <h3>Job Opening Form</h3>
+            </div>
+            <hr>
+            <div>
+                <form method="POST">
+                    {% csrf_token%}
+                    <div>
+                        <span>Company : </span><span>{{ company }}</span><br>
+                    </div>
+                    <p></p>
+                    <div>
+                        <span>Job Location : </span><input type="text" name="job_location" placeholder="Job Location" required><br>
+                    </div>
+                    <p></p>
+                    <div>
+                        <span>Job Role : </span><input type="text" name="job_role" placeholder="Job Role"required><br>
+                    </div>
+                    <p></p>
+                    <div>
+                        <span>Description : </span><textarea name="description" placeholder="Please Write the Description." required></textarea><br>
+                    </div>
+                    <p></p>
+                    <div>
+                        <input type="submit" placeholder="Submit">
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="col-md-3"></div>
+    </div>
+</div>
+{% endblock content%}

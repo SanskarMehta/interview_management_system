@@ -1,0 +1,41 @@
+{% extends 'user_login/user_base.html' %}
+{% load static %}
+{% block title %}User Feedback{% endblock title %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-2"></div>
+        <div class="col-md-8">
+            <div>
+                <h2>Feedback Form</h2>
+            </div>
+            <hr>
+            <div>
+                <form method="post">
+                    {% csrf_token %}
+                    <div>
+                        <span>Username : <b>{{ user.username }}</b></span>
+                    </div>
+                    <p></p>
+                    <p></p>
+                    <div>
+                        <span>Interviewer : <b>{{ interviewer.username }}</b></span>
+                    </div>
+                    <p></p>
+                    <p></p>
+                    <div>
+                        <label>Feedback : </label>
+                        <span><textarea name="feedback" placeholder="Please write your feedback here."></textarea></span>
+                    </div>
+                    <p></p>
+                    <p></p>
+                    <div>
+                        <input type="submit" value="Submit" class="btn btn-primary">
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="col-md-2"></div>
+    </div>
+</div>
+{% endblock content %}

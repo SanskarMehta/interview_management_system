@@ -1,0 +1,33 @@
+{% extends 'user_login/company_base.html' %}
+{% block title %}Schedule Interview{% endblock title %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-2"></div>
+        <div class="col-md-8">
+            <div>
+                <h3>Schedule Interviews</h3>
+            </div>
+            <div>
+                {% for applicant in applicants %}
+                <div class="card">
+                  <div class="card-header">Application ID : {{ applicant.id }}</div>
+                  <div class="card-body">
+                    <h5 class="card-title">Applicant Name : {{ applicant.job_application.user.username }}</h5>
+                    <span class="card-text">Status of Technical Round : <b>{{ applicant.technical_round }}</b></span>
+                    <br>
+                    <span class="card-text">Status of HR Round : <b>{{ applicant.HR_round }}</b></span>
+                    <p></p>
+                    <div>
+                        <a href="{% url 'technical-interview' applicant.id %}" class="btn btn-outline-primary">Schedule Interview</a>
+                    </div>
+                  </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="col-md-2"></div>
+    </div>
+</div>
+{% endblock content %}
+{% block jquery %}{% endblock jquery %}

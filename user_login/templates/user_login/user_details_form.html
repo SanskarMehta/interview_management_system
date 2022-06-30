@@ -1,0 +1,42 @@
+{% extends 'user_login/user_base.html' %}
+{% block title %}User-Details{% endblock title %}
+{% block content %}
+<h3>Welcome to User Detail Form</h3>
+<form enctype="multipart/form-data" method="post">
+    {% csrf_token %}
+    <div>
+        <span>Phone Number : </span><input type="tel" name="mobilenumber" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" placeholder="123-456-7890" required>
+    </div>
+    <p></p>
+    <div>
+        <span>Technology : </span><input type="text" name="technology" placeholder="Ex. Python" required>
+    </div>
+    <p></p>
+    <div>
+        <span>10th marks : </span><input type="number" name="marks_10th" step="any" placeholder="Ex. 98" required>
+    </div>
+    <p></p>
+    <div>
+        <span>12th marks : </span><input type="number" name="marks_12th" step="any" placeholder="Ex. 96" required>
+    </div>
+    <p></p>
+    <div>
+        <span>CPI (College , Out of 10) : </span><input type="number" name="cpi" step="any" placeholder="Ex 8.97" required>
+    </div>
+    <p></p>
+    <div>
+        <span>Upload your CV : </span><input type="file" name="cvfile" required>
+    </div>
+    <p></p>
+    <div>
+        <input type="submit">
+    </div>
+    <p></p>
+</form>
+
+<div>
+    {% for message in messages %}
+    <h4>{{ message }}</h4>
+    {% endfor %}
+</div>
+{% endblock content %}

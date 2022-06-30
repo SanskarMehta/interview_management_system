@@ -1,0 +1,52 @@
+{% extends 'user_login/interviewer_base.html' %}
+{% block title %}Interview-Details{% endblock title %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <h3>Welcome to Interview Detail Form</h3>
+        <div class="col-md-2"></div>
+        <div class="col-md-8">
+            <form method="post">
+                {% csrf_token %}
+                <div>
+                    <span>Phone Number : </span><input type="tel" name="mobilenumber" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" placeholder="123-456-7890">
+                </div>
+                <p></p>
+                <div>
+                    <span>Technology : </span><input type="text" name="technology" placeholder="Ex. Python">
+                </div>
+                <p></p>
+                <div>
+                    <span>Job Role : </span><input type="text" name="job_role" placeholder="Ex. Software Developer">
+                </div>
+                <p></p>
+                <div>
+                    <span>Experience : </span><input type="text" name="experience" placeholder="Ex. 3+yrs">
+                </div>
+                <p></p>
+                <div>
+                    <span>Type of Interviewer : </span>
+                    <select name="interviewer_type" id="id_interviewer_type" required>
+                        <option value="">--------</option>
+                        {% for i in interviewer_type %}
+```                     <option value="{{ i }}">{{ i }}</option>
+                        {% endfor%}
+                    </select>
+                </div>
+                <p></p>
+                <div>
+                    <input type="submit">
+                </div>
+                <p></p>
+            </form>
+            <div>
+                {% for message in messages %}
+                <h4>{{ message }}</h4>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="col-md-2"></div>
+    </div>
+</div>
+
+{% endblock content %}

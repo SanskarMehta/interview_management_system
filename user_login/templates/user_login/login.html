@@ -1,0 +1,37 @@
+{% extends 'user_login/base.html' %}
+{% block title%}Login-Page{% endblock title%}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-3"></div>
+        <div class="col-md-6">
+            <h3>Welcome to login Page</h3>
+            <form method="POST">
+                {% csrf_token %}
+                <div>
+                       <span>Username : </span><input type="text" name="username" placeholder="Username" required><br>
+                </div>
+                <p></p>
+                    {% csrf_token %}
+                <div>
+                       <span>Password : </span><input type="password" name="password" placeholder="Password" required><br>
+                </div>
+                <p></p>
+                <div>
+                    <input type="Submit">
+                        <small class="text-muted ml-2">
+                            <a href="{% url 'password_reset' %}">Forgot Password?</a>
+                        </small>
+                </div>
+            </form>
+
+            <div>
+                {% for message in messages %}
+                <h3>{{ message }}</h3>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="col-md-3"></div>
+    </div>
+</div>
+{% endblock content %}
