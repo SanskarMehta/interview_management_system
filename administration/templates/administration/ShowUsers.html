@@ -1,0 +1,27 @@
+{% extends 'administration/admin_home.html' %}
+{% block title %}Users{% endblock title %}
+{% block content %}
+
+<div class="container">
+  <h2>All Users</h2>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>User ID</th>
+        <th>Name</th>
+        <th>Email</th>
+      </tr>
+    </thead>
+    {% for user in users %}
+    <tbody>
+      <tr>
+        <td><a href="{% url 'admin-user-details' user.id%}">{{ user.id }}</a></td>
+        <td>{{ user.username }}</td>
+        <td>{{ user.email }}</td>
+      </tr>
+    </tbody>
+    {% endfor %}
+  </table>
+</div>
+{% endblock content %}
+{% block jquery %}{% endblock jquery %}

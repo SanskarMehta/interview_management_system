@@ -20,3 +20,11 @@
     </div>
 </div>
 {% endblock content%}
+{% block jquery%}
+<script language="javascript">
+    setTimeout(function(){
+       window.location.reload(1);
+       console.log("hello");
+    }, 60000);
+</script>
+{% endblock jquery%}

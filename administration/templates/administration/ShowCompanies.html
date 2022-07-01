@@ -1,0 +1,26 @@
+{% extends 'administration/admin_home.html' %}
+{% block title %}Companies{% endblock title %}
+{% block content %}
+<div class="container">
+  <h2>Companies</h2>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Email</th>
+      </tr>
+    </thead>
+    {% for company in companies %}
+    <tbody>
+      <tr>
+        <td>{{ company.company.id }}</td>
+        <td>{{ company.company.username }}</td>
+        <td>{{ company.company.email }}</td>
+      </tr>
+    </tbody>
+    {% endfor %}
+  </table>
+</div>
+{% endblock content %}
+{% block jquery %}{% endblock jquery %}

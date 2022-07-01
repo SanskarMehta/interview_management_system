@@ -1,0 +1,14 @@
+{% extends 'administration/base.html' %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <div>
+                <div class="alert alert-success" role="alert">
+                    Thank you for logging with us. Do you want to<a href="{% url 'admin-login' %}" class="alert-link"> Login </a>again. Give it a click if you like.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

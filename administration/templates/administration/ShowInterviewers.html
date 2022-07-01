@@ -1,0 +1,26 @@
+{% extends 'administration/admin_home.html' %}
+{% block title %}Interviewers{% endblock title %}
+{% block content %}
+<div class="container">
+  <h2>Interviewers</h2>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Email</th>
+      </tr>
+    </thead>
+    {% for interviewer in interviewers %}
+    <tbody>
+      <tr>
+        <td><a href="{% url 'admin-interviewer-details' interviewer.id %}">{{ interviewer.id }}</a></td>
+        <td>{{ interviewer.interviewer.username }}</td>
+        <td>{{ interviewer.interviewer.email }}</td>
+      </tr>
+    </tbody>
+    {% endfor %}
+  </table>
+</div>
+{% endblock content %}
+{% block jquery %}{% endblock jquery %}

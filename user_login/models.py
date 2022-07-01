@@ -7,6 +7,7 @@ class CustomUser(AbstractUser):
     is_interviewer = models.BooleanField(default=False)
     is_company = models.BooleanField(default=False)
     is_first_time = models.BooleanField(default=True)
+    is_block = models.BooleanField(default=False)
 
     def __str__(self):
         return self.username

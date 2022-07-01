@@ -1,0 +1,29 @@
+{% extends 'administration/admin_home.html' %}
+{% block title %}{% endblock title %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-2"></div>
+        <div class="col-md-8">
+            {% for company in companies %}
+            <div class="card" style="margin:10px;">
+                <div class="card-header"><span>ID : </span><span>{{ company.company.id }}</span></div>
+                <div class="card-body">
+                    <p>Name : <span>{{ company.company.username }}</span></p>
+                    <p>Email : <span>{{ company.company.email }}</span></p>
+                    <div>
+                        <button type="button" data-userjob_id="{{ company.id }}" data-status="0" class="btn btn-outline-success cv_status accept_status_{{ company.id }}">
+                            Accept
+                        </button>
+                        <button type="button" data-userjob_id="{{ company.id }}" data-status="1" class="btn btn-outline-danger cv_status reject_status_{{ company.id }}">Reject
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="col-md-2"></div>
+    </div>
+</div>
+{% endblock content %}
+{% block jquery %}{% endblock jquery %}

@@ -1,0 +1,27 @@
+{% extends 'administration/admin_home.html' %}
+{% block title %}Update Profile{% endblock title %}
+{% load crispy_forms_tags %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-3"></div>
+        <div class="col-md-6">
+          <div>
+              <h3>Update Profile Page</h3>
+          </div>
+            <hr>
+          <div>
+              <form method="POST">
+                {% csrf_token %}
+                {{ form|crispy }}
+                <p></p>
+                {{ form2|crispy }}
+                <p></p>
+                <button type="submit" class="btn btn-success">Update</button>
+              </form>
+          </div>
+        </div>
+        <div class="col-md-3"></div>
+    </div>
+</div>
+{% endblock content %}
