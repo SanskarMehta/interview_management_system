@@ -1,4 +1,5 @@
 {% extends 'administration/admin_home.html' %}
+{% load static %}
 {% block title %}Interviewers{% endblock title %}
 {% block content %}
 <section style="background-color: #eee;">
@@ -72,7 +73,24 @@
         </div>
       </div>
     </div>
+    <div class="row">
+        <div class="col-md-12" style="margin-top:10px; margin-bottom:10px;">
+            <div class="card-body action_button_{{ user_detail.user.id }}">
+             {% if user_detail.user.is_block == False  %}
+                <div class="block_status_{{ user_detail.user.id }}">
+                  <span style="margin-right:10px;">Would you like to Block ?</span><button type="button" data-user_id="{{ user_detail.user.id }}" data-status="1" class="btn btn-outline-danger block_status">Block</button>
+                </div>
+             {% else %}
+                <div class="unblock_status_{{ user_detail.user.id }}">
+                  <span style="margin-right:10px;">Would you like to Unblock ?</span><button type="button" data-user_id="{{ user_detail.user.id }}" data-status="0" class="btn btn-outline-info block_status">Unblock</button>
+                </div>
+             {% endif %}
+            </div>
+        </div>
+    </div>
   </div>
 </section>
 {% endblock content %}
-{% block jquery %}{% endblock jquery %}
+{% block jquery %}
+<script src="{% static 'administration/block_unblock.js' %}"></script>
+{% endblock jquery %}

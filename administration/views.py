@@ -1,14 +1,19 @@
+import json
+
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
+from django.http import JsonResponse
 from django.shortcuts import render, redirect
+from django.utils.decorators import method_decorator
 from django.views import View
+from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
 
 from user_login.forms import UpdateUserDetailForm, UserEmailUpdateForm
 from user_login.models import CustomUser, InterviewerDetails, CompanyAcceptance, UserDetails, InterviewerCompany, \
-    Notification
+    Notification, BlockUser
 
 
 class Home(TemplateView):
@@ -68,11 +73,13 @@ class DetailsOfInterviewer(View):
     def get(self, request, *args, **kwargs):
         interviewer_details = InterviewerDetails.objects.get(id=kwargs['pk'])
         company_name = InterviewerCompany.objects.get(interviewer=interviewer_details.interviewer)
-        return render(request, 'administration/DetailsInterviewer.html', {'interviewer_detail': interviewer_details, 'company': company_name.company.username})
+        return render(request, 'administration/DetailsInterviewer.html',
+                      {'interviewer_detail': interviewer_details, 'company': company_name.company.username})
 
 
 class CompanyRegisterByAdmin(View):
     pass
+
     def get(self, request, *args, **kwargs):
         return render(request, 'administration/user_register.html')
 
@@ -89,7 +96,8 @@ class CompanyRegisterByAdmin(View):
                 messages.info(request, 'Email is already exist.')
                 return redirect('company-register-admin')
             else:
-                user = CustomUser.objects.create_user(username=username, email=email, password=password, is_company=True)
+                user = CustomUser.objects.create_user(username=username, email=email, password=password,
+                                                      is_company=True)
                 user.save()
                 company_acceptance = CompanyAcceptance(company=user)
                 company_acceptance.save()
@@ -134,10 +142,10 @@ class InterviewerRegisterByAdmin(View):
 class CompanyAcceptanceByAdmin(View):
     def get(self, reqeust, *args, **kwargs):
         companies = CompanyAcceptance.objects.filter(is_accepted=False)
-        return render(reqeust, 'administration/company_accept.html',{'companies':companies})
+        return render(reqeust, 'administration/company_accept.html', {'companies': companies})
 
 
-class AdminUpdateUserDetails(LoginRequiredMixin,View):
+class AdminUpdateUserDetails(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         form = UpdateUserDetailForm(instance=request.user.userdetails)
         form2 = UserEmailUpdateForm(instance=request.user)
@@ -151,9 +159,31 @@ class AdminUpdateUserDetails(LoginRequiredMixin,View):
             if form2.is_valid():
                 form2.save()
                 # messages.success(request,'Succefully Updated the Values and Email')
-                return redirect('admin-user-details',pk=request.user.id)
+                return redirect('admin-user-details', pk=request.user.id)
             else:
                 # messages.success(request,'Succefully Updated the Values')
                 return redirect('user-profile')
         else:
             return redirect('admin-update-profile')
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class BlockUnblock(LoginRequiredMixin, View):
+    def post(self, request, *args, **kwargs):
+        request_data = request.read()
+        form_data = json.loads(request_data.decode('utf-8'))
+        user_id = form_data.get('user_id')
+        block_status = form_data.get('data_status')
+        if block_status == '1':
+            message = form_data.get('message')
+            block_user = CustomUser.objects.get(id=user_id)
+            block_user.is_block = True
+            block_user.save()
+            user = CustomUser.objects.get(id=user_id)
+            block = BlockUser.objects.create(user=user, reason=message)
+            block.save()
+        else:
+            block_user = CustomUser.objects.get(id=user_id)
+            block_user.is_block = False
+            block_user.save()
+        return JsonResponse({'message': 'Completed Successfully'})

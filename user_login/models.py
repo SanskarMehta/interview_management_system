@@ -8,6 +8,7 @@ class CustomUser(AbstractUser):
     is_company = models.BooleanField(default=False)
     is_first_time = models.BooleanField(default=True)
     is_block = models.BooleanField(default=False)
+    is_activated = models.BooleanField(default=True)
 
     def __str__(self):
         return self.username
@@ -127,4 +128,9 @@ class RescheduleRequests(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='user')
     application = models.ForeignKey(UserInterview, on_delete=models.CASCADE)
     interview_type = models.IntegerField()
+    reason = models.CharField(max_length=300)
+
+
+class BlockUser(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     reason = models.CharField(max_length=300)

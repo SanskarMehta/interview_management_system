@@ -4,7 +4,7 @@ from django.conf.urls.static import static
 from django.contrib.auth import views as auth_view
 from administration.views import AdminLogin, Home, AdminAfterLogin, ShowUser, ShowInterviewers, ShowCompany, \
     CompanyAcceptanceByAdmin, DetailsOfUser, DetailsOfInterviewer, AdminUpdateUserDetails, UserRegisterByAdmin, \
-    CompanyRegisterByAdmin
+    CompanyRegisterByAdmin, BlockUnblock
 
 urlpatterns = [
     path('', Home.as_view(), name='admin-home'),
@@ -21,6 +21,7 @@ urlpatterns = [
     path('update_admin_info/<int:pk>', AdminUpdateUserDetails.as_view(), name='admin-update-profile'),
     path('user_register_admin/', UserRegisterByAdmin.as_view(), name='user-register-admin'),
     path('company_register_admin/', CompanyRegisterByAdmin.as_view(), name='company-register-admin'),
+    path('block_unblock/', BlockUnblock.as_view(), name='block-unblock'),
 ]
 
 if settings.DEBUG:

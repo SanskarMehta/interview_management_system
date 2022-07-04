@@ -1,4 +1,5 @@
 {% extends 'administration/admin_home.html' %}
+{% load static %}
 {% block title %}Companies{% endblock title %}
 {% block content %}
 <div class="container">
@@ -9,6 +10,7 @@
         <th>ID</th>
         <th>Name</th>
         <th>Email</th>
+        <th>Action</th>
       </tr>
     </thead>
     {% for company in companies %}
@@ -17,10 +19,23 @@
         <td>{{ company.company.id }}</td>
         <td>{{ company.company.username }}</td>
         <td>{{ company.company.email }}</td>
+        <td class="action_button_{{ company.company.id }}">
+             {% if company.company.is_block == False  %}
+                <div class="block_status_{{ company.company.id }}">
+                  <span style="margin-right:30px;">Would you like to Block ?</span><button type="button" data-user_id="{{ company.company.id }}" data-status="1" class="btn btn-outline-danger block_status">Block</button>
+                </div>
+             {% else %}
+                <div class="unblock_status_{{ company.company.id }}">
+                  <span style="margin-right:30px;">Would you like to Unblock ?</span><button type="button" data-user_id="{{ company.company.id }}" data-status="0" class="btn btn-outline-info block_status">Unblock</button>
+                </div>
+             {% endif %}
+        </td>
       </tr>
     </tbody>
     {% endfor %}
   </table>
 </div>
 {% endblock content %}
-{% block jquery %}{% endblock jquery %}
+{% block jquery %}
+<script src="{% static 'administration/block_unblock.js' %}"></script>
+{% endblock jquery %}

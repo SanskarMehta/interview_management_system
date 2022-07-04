@@ -34,28 +34,32 @@ class UserLogin(View):
         )
         if user is not None:
             if user.is_block == False:
-                if user.is_interviewer:
-                    login(request, user)
-                    if user.is_first_time:
-                        return redirect('interviewer-details-form')
-                    else:
-                        return redirect('interviewer-home')
-                elif user.is_company:
-                    company_accepted = CompanyAcceptance.objects.filter(company=user).get()
-                    if company_accepted.is_accepted:
+                if user.is_activated == True:
+                    if user.is_interviewer:
                         login(request, user)
-                        return redirect('company-home')
+                        if user.is_first_time:
+                            return redirect('interviewer-details-form')
+                        else:
+                            return redirect('interviewer-home')
+                    elif user.is_company:
+                        company_accepted = CompanyAcceptance.objects.filter(company=user).get()
+                        if company_accepted.is_accepted:
+                            login(request, user)
+                            return redirect('company-home')
+                        else:
+                            messages.info(request,
+                                          'Your company is not accepted from the admin side. You can login after accepted by admin.')
+                            return redirect('login')
                     else:
-                        messages.info(request,
-                                      'Your company is not accepted from the admin side. You can login after accepted by admin.')
-                        return redirect('login')
+                        login(request, user)
+                        if user.is_first_time:
+                            print(user.id)
+                            return redirect('user-details-form')
+                        else:
+                            return redirect('user-home')
                 else:
-                    login(request, user)
-                    if user.is_first_time:
-                        print(user.id)
-                        return redirect('user-details-form')
-                    else:
-                        return redirect('user-home')
+                    messages.info(request,'Your account is deactivated. Please reactivate your account. ')
+                    return redirect('login')
             else:
                 messages.info(request, "Your account is blocked by admin. Please call on number : 129121####.")
                 return redirect('login')
