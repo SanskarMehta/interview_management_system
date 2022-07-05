@@ -1,7 +1,8 @@
+import os
 from datetime import datetime
 import json
 from django.contrib import messages
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login, authenticate, logout
 from django.core.mail import send_mail
 from django.db.models import Q
 from django.http import JsonResponse
@@ -58,7 +59,7 @@ class UserLogin(View):
                         else:
                             return redirect('user-home')
                 else:
-                    messages.info(request,'Your account is deactivated. Please reactivate your account. ')
+                    messages.info(request, 'Your account is deactivated. Please reactivate your account. ')
                     return redirect('login')
             else:
                 messages.info(request, "Your account is blocked by admin. Please call on number : 129121####.")
@@ -802,3 +803,40 @@ class PostInterviewProcess(LoginRequiredMixin, View):
                 interviewer__interviewer=request.user).exclude(
                 Q(application__technical_round='Scheduled') | Q(application__technical_round='Rejected'))
         return render(request, 'user_login/post_interview_applicants.html', {'interviews': interviews})
+
+
+class DeactivateAccount(View):
+    def get(self, request, *args, **kwargs):
+        print(kwargs['pk'])
+        CustomUser.objects.filter(id=kwargs['pk']).update(is_activated=False)
+        logout(request)
+        return redirect('login')
+
+
+class ReactivateAccount(View):
+    def get(self, request, *args, **kwargs):
+        return render(request, 'user_login/reactivate.html')
+
+    def post(self, request, *args, **kwargs):
+        email = request.POST['email']
+        print(email,os.getenv('EMAIL_USER'))
+        url = 'http://127.0.0.1:8000/reactivate/user_info/'
+        send_mail('Reactivate Your Account', url, from_email=os.getenv('EMAIL_HOST_USER'),recipient_list=[email], fail_silently=False, )
+        return redirect('login')
+
+
+class ReactivationUser(View):
+    def get(self, request, *args, **kwargs):
+        return render(request,'user_login/reactivation_page.html')
+
+    def post(self, request, *args, **kwargs):
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(username=username , password=password)
+        if user is not None:
+            user_status = CustomUser.objects.get(id=user.id)
+            user_status.is_activated = True
+            user_status.save()
+            return redirect('login')
+        else:
+            return redirect('')

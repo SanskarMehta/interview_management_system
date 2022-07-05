@@ -6,7 +6,8 @@ from user_login.views import UserLogin, UserRegister, InterviewerHome, UserHome,
     UpdateInterviewerDetails, ShowAppliedUser, JobOpeningUpdate, ShowAcceptedInterviewers, \
     ScheduleApplicantInterview, InterviewType, GetTimeSlot, ShowInterviewerScheduled, ApplicantDetails, \
     ShowDetailSchedule, DetailsInterviewer, UserMessage, CompanyMessage, InterviewerMessage, UserFeedbackView, \
-    RescheduleRequest, ShowRescheduleRequests, FeedbackOfInterviewer, PostInterviewProcess
+    RescheduleRequest, ShowRescheduleRequests, FeedbackOfInterviewer, PostInterviewProcess, DeactivateAccount, \
+    ReactivateAccount, ReactivationUser
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth import views as auth_view
@@ -74,6 +75,9 @@ urlpatterns = [
     path('password-reset-complete/',
          auth_view.PasswordResetCompleteView.as_view(template_name='user_login/password_reset_complete.html'),
          name="password_reset_complete"),
+    path('deactivate/<int:pk>', DeactivateAccount.as_view(), name='deactivate'),
+    path('reactivate/', ReactivateAccount.as_view(), name='reactivate'),
+    path('reactivate/user_info/', ReactivationUser.as_view(), name='reactivation'),
 ]
 
 if settings.DEBUG:

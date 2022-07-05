@@ -1,0 +1,28 @@
+{% extends 'user_login/base.html' %}
+{% block title %}Reactivate{% endblock title %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-2"></div>
+        <div class="col-md-8">
+            <div><h2>Reactivation Form</h2></div>
+            <form method="POST">
+                {% csrf_token %}
+                <p></p>
+                <div>
+                    <span>Username : </span><input type="text" name="username" required>
+                </div>
+                <p></p>
+                <div>
+                    <span>Password : </span><input type="password" name="password" required>
+                </div>
+                <p></p>
+                <div>
+                    <input type="Submit" value="Reactivate" class="btn btn-outline-info">
+                </div>
+            </form>
+        </div>
+        <div class="col-md-2"></div>
+    </div>
+</div>
+{% endblock content %}

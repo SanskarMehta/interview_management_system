@@ -42,7 +42,8 @@
       </li>
     </ul>
     <form class="form-inline my-2 my-lg-0">
-      <a href="{% url 'interviewer-messages' %}" class="btn btn-outline-success my-2 my-sm-0" type="submit">Messages</a>
+      <span style="margin-left:5px; margin-right:5px;"><a href="{% url 'deactivate' request.user.id %}" class="btn btn-outline-danger my-2 my-sm-0" style="btn btn-outline-danger my-2 my-sm-0">Deactivate</a></span>
+      <span style="margin-left:5px; margin-right:5px;"><a href="{% url 'interviewer-messages' %}" class="btn btn-outline-success my-2 my-sm-0" type="submit">Messages</a></span>
     </form>
   </div>
 </nav>

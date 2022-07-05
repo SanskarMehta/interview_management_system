@@ -78,8 +78,6 @@ class DetailsOfInterviewer(View):
 
 
 class CompanyRegisterByAdmin(View):
-    pass
-
     def get(self, request, *args, **kwargs):
         return render(request, 'administration/user_register.html')
 
@@ -102,7 +100,7 @@ class CompanyRegisterByAdmin(View):
                 company_acceptance = CompanyAcceptance(company=user)
                 company_acceptance.save()
                 notification_message = username + "is a new company and it has registered in our portal.It wants to use our services."
-                admin_notification = Notification.objects.create(sender=user, receiver='admin',
+                admin_notification = Notification.objects.create(sender=user, receiver=request.user,
                                                                  message=notification_message)
                 admin_notification.save()
                 return redirect('company-acceptance')
@@ -187,3 +185,23 @@ class BlockUnblock(LoginRequiredMixin, View):
             block_user.is_block = False
             block_user.save()
         return JsonResponse({'message': 'Completed Successfully'})
+
+
+@method_decorator(csrf_exempt,name='dispatch')
+class CompanyAcceptReject(LoginRequiredMixin,View):
+    def post(self,request, *args , **kwargs):
+        form_data = request.read()
+        request_data = json.loads(form_data.decode('utf-8'))
+        company_id = request_data.get('company_id')
+        print(company_id)
+        acceptance_status = request_data.get('acceptance_status')
+        print(acceptance_status)
+        if acceptance_status == "0":
+            Company=CompanyAcceptance.objects.get(id=int(company_id))
+            Company.is_accepted = True
+            Company.save()
+        else:
+            Company=CompanyAcceptance.objects.get(id=int(company_id))
+            Company.is_accepted = False
+            Company.save()
+        return JsonResponse({'msg':'Thank You for choosing us'})
