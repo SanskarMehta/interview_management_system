@@ -5,7 +5,7 @@ $(document).ready(function(){
         $.ajax({
             type: "DELETE",
             data: JSON.stringify(data),
-            url : "/ShowInterviewers/",
+            url : "/show_interviewers/",
             success:function(response){
                 if(response["success"] == true){
                     alert(response["message"])

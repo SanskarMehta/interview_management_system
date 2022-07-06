@@ -17,10 +17,16 @@ from user_login.models import CustomUser, InterviewerDetails, CompanyAcceptance,
 
 
 class Home(TemplateView):
+    """
+    This view is a home page of custom admin panel.
+    """
     template_name = 'administration/base.html'
 
 
 class AdminLogin(View):
+    """
+    This view is for login view and,it verifies whether user is admin or not.
+    """
     def get(self, request, *args, **kwargs):
         return render(request, 'administration/login.html')
 
@@ -41,35 +47,62 @@ class AdminLogin(View):
 
 
 class AdminAfterLogin(LoginRequiredMixin, View):
+    """
+    This view is called after user succefully logged in as a Admin
+    """
     def get(self, request, *args, **kwargs):
         return render(request, 'administration/admin_home.html')
 
 
-class ShowInterviewers(View):
+class ShowInterviewersAdmin(View):
+    """
+    This view is used to show all interviewers.
+    interviewers -> list : It is a collection of InterviewerDetails objects.
+    """
     def get(self, request, *args, **kwargs):
         interviewers = InterviewerDetails.objects.all()
         return render(request, 'administration/ShowInterviewers.html', {'interviewers': interviewers})
 
 
 class ShowUser(View):
+    """
+    This view is used to show all Users.
+    Users -> list : It is a collection of User objects.
+    """
     def get(self, request, *args, **kwargs):
         Users = CustomUser.objects.filter(is_company=False, is_interviewer=False, is_superuser=False)
         return render(request, 'administration/ShowUsers.html', {'users': Users})
 
 
 class ShowCompany(View):
+    """
+    This view is used to show all Companies.
+    company -> list : It is a collection of objects of CompanyAcceptance where all companies are exist.
+    """
     def get(self, request, *args, **kwargs):
         company = CompanyAcceptance.objects.select_related('company').all()
         return render(request, 'administration/ShowCompanies.html', {'companies': company})
 
 
 class DetailsOfUser(View):
+    """
+    This view is used to show the details of specific user.Also provide the block and unblock functionality.
+    user_details -> object : It is an object of UserDetails where all the details of user exist.
+    kwargs['pk'] -> int : It is a id of User , using which we get the details of that particular user.
+    """
     def get(self, request, *args, **kwargs):
         user_details = UserDetails.objects.get(user_id=kwargs['pk'])
         return render(request, 'administration/DetailsUser.html', {'user_detail': user_details})
 
 
 class DetailsOfInterviewer(View):
+    """
+    This view is used to show the details of specific user.
+    interviewer_details -> object : It is an object of InterviewerDetails where all the details of particular Interviewer exist.
+    company_name -> object : It consists the data related to Interviewer and Company relation.Mainly used to get the name of the company in which employee works.
+    kwargs['pk'] -> It is a id of InterviewerDetails , using which we get the details of that particular Interviewer
+    interviewer_details.interviewer -> object : This object is used to find th another object from the InterviewerCompany.
+    """
     def get(self, request, *args, **kwargs):
         interviewer_details = InterviewerDetails.objects.get(id=kwargs['pk'])
         company_name = InterviewerCompany.objects.get(interviewer=interviewer_details.interviewer)
@@ -78,6 +111,13 @@ class DetailsOfInterviewer(View):
 
 
 class CompanyRegisterByAdmin(View):
+    """
+    This view is used to register a new company by the Admin.
+    username -> str : It holds the username which is retrieved from the html side.
+    email -> str : It holds the email which is retrieved from the html side.
+    password -> str : It holds the password which is retrieved from the html side.
+    password2 -> str : It holds the confirm-password which is retrieved from the html side.
+    """
     def get(self, request, *args, **kwargs):
         return render(request, 'administration/user_register.html')
 
@@ -109,6 +149,13 @@ class CompanyRegisterByAdmin(View):
 
 
 class UserRegisterByAdmin(View):
+    """
+    This view is used to register a new user by the Admin.
+    username -> str : It holds the username which is retrieved from the html side.
+    email -> str : It holds the email which is retrieved from the html side.
+    password -> str : It holds the password which is retrieved from the html side.
+    password2 -> str : It holds the confirm-password which is retrieved from the html side.
+    """
     def get(self, request, *args, **kwargs):
         return render(request, 'administration/user_register.html')
 
@@ -133,17 +180,22 @@ class UserRegisterByAdmin(View):
             return render(request, 'administration/user_register.html')
 
 
-class InterviewerRegisterByAdmin(View):
-    pass
-
-
 class CompanyAcceptanceByAdmin(View):
+    """
+    This view shows the all non-accepted companies by the Admin.
+    companies -> list : It is a collection of objects of CompanyAcceptance where companies are not accepted
+    """
     def get(self, reqeust, *args, **kwargs):
         companies = CompanyAcceptance.objects.filter(is_accepted=False)
         return render(reqeust, 'administration/company_accept.html', {'companies': companies})
 
 
 class AdminUpdateUserDetails(LoginRequiredMixin, View):
+    """
+    This view is used for updating the details of Admin Profile.
+    form -> form : It is used to update the data of admin details
+    form2 -> form : It is used to update the email of Admin
+    """
     def get(self, request, *args, **kwargs):
         form = UpdateUserDetailForm(instance=request.user.userdetails)
         form2 = UserEmailUpdateForm(instance=request.user)
@@ -167,6 +219,11 @@ class AdminUpdateUserDetails(LoginRequiredMixin, View):
 
 @method_decorator(csrf_exempt, name='dispatch')
 class BlockUnblock(LoginRequiredMixin, View):
+    """
+    This is used for blocking and unblocking the user and company using AJAX
+    user_id -> int : This is the id of the company or User which is used for blocking/unblocking.
+    block_status -> str : This is used for whether admin requested for block("1") or unblock("0").
+    """
     def post(self, request, *args, **kwargs):
         request_data = request.read()
         form_data = json.loads(request_data.decode('utf-8'))
@@ -189,6 +246,10 @@ class BlockUnblock(LoginRequiredMixin, View):
 
 @method_decorator(csrf_exempt,name='dispatch')
 class CompanyAcceptReject(LoginRequiredMixin,View):
+    """
+    This view is used for accepting or rejecting the company request.
+    company_id -> int : This is used for company id , which is used in accepting/rejecting request.
+    """
     def post(self,request, *args , **kwargs):
         form_data = request.read()
         request_data = json.loads(form_data.decode('utf-8'))

@@ -24,7 +24,7 @@ urlpatterns = [
     path('interviewer_details_form/', InterviewerDetailsForm.as_view(), name='interviewer-details-form'),
     path('company_job_openings/', CompanyJobOpenings.as_view(), name='company-job-openings'),
     path('logout/', auth_view.LogoutView.as_view(template_name='user_login/base.html'), name='logout'),
-    path('company_add_interviewer', CompanyAddInterviewer.as_view(), name='company-add-interviewer'),
+    path('company_add_interviewer/', CompanyAddInterviewer.as_view(), name='company-add-interviewer'),
     path('job_lists/', JobLists.as_view(), name='job-lists'),
     path('job_lists/<int:pk>', JobListsApply.as_view(), name='job-apply'),
     path('after_apply/', AfterJobApply.as_view(), name='after-apply'),

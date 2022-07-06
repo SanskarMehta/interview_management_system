@@ -3,6 +3,7 @@ from datetime import datetime
 import json
 from django.contrib import messages
 from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth.decorators import permission_required
 from django.core.mail import send_mail
 from django.db.models import Q
 from django.http import JsonResponse
@@ -11,6 +12,9 @@ from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import UpdateView, TemplateView
+from rest_framework.decorators import permission_classes
+from rest_framework.permissions import IsAdminUser
+
 from user_login.forms import UpdateUserDetailForm, UpdateInterviewerDetailForm, UserEmailUpdateForm, UpdateJobOpenings, \
     ScheduleInterviews, UserFeedbackByInterviewer
 from user_login.models import CustomUser, CompanyAcceptance, UserDetails, InterviewerCompany, JobOpenings, \
@@ -262,6 +266,8 @@ class InterviewerDetailsForm(LoginRequiredMixin, View):
 
 
 class JobLists(LoginRequiredMixin, View):
+
+
     def get(self, request, *args, **kwargs):
         job_lists = JobOpenings.objects.all()
         return render(request, 'user_login/job_lists.html', {'job_lists': job_lists})
@@ -819,8 +825,8 @@ class ReactivateAccount(View):
 
     def post(self, request, *args, **kwargs):
         email = request.POST['email']
-        print(email,os.getenv('EMAIL_USER'))
-        url = 'http://127.0.0.1:8000/reactivate/user_info/'
+        domain = request.build_absolute_uri('/')[:-1]
+        url = f"{domain}/reactivate/user_info/"
         send_mail('Reactivate Your Account', url, from_email=os.getenv('EMAIL_HOST_USER'),recipient_list=[email], fail_silently=False, )
         return redirect('login')
 

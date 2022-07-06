@@ -31,7 +31,7 @@
         </a>
         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
           <a class="dropdown-item" href="{% url 'show-users' %}">Show Users</a>
-          <a class="dropdown-item" href="{% url 'show-interviewers' %}">Show Interviewers</a>
+          <a class="dropdown-item" href="{% url 'show-interviewers-admin' %}">Show Interviewers</a>
           <a class="dropdown-item" href="{% url 'show-companies' %}">Show Companies</a>
           <a class="dropdown-item" href="{% url 'admin-user-details' request.user.id%}">Profile</a>
           <a class="dropdown-item" href="{% url 'admin-update-profile' request.user.id%}">Update Profile</a>
