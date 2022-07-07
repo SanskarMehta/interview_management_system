@@ -16,7 +16,7 @@
                             <p>Interview Date : {{ interview.interview_date }}</p>
                             <p>Interviewer : <a href="{% url 'interviewer-details' interview.interviewer_id %}">{{ interview.interviewer }}</a></p>
                             <div>
-                                <a href="{% url 'reschedule-request' interview.application_id %}" class="btn btn-primary">Reschedule</a>
+                                <a href="{% url 'reschedule-request' interview.id %}" class="btn btn-primary">Reschedule</a>
                                 <a href="{% url 'user-feedback' interview.interviewer_id %}" class="btn btn-outline-success">Feedback</a>
                             </div>
                         </div>
@@ -30,7 +30,7 @@
                             <p>Interview Date : {{ interview.interview_date }}</p>
                             <p>Interviewer : <a href="{% url 'interviewer-details' interview.interviewer_id %}">{{ interview.interviewer }}</a></p>
                             <div>
-                                <a href="{% url 'reschedule-request' interview.application_id %}" class="btn btn-primary">Reschedule</a>
+                                <a href="{% url 'reschedule-request' interview.id %}" class="btn btn-primary">Reschedule</a>
                                 <a href="{% url 'user-feedback' interview.interviewer_id %}" class="btn btn-outline-success">Feedback</a>
                             </div>
                         </div>

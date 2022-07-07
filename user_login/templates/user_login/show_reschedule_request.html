@@ -8,19 +8,11 @@
             {% for reschedule in reschedule_requests %}
                 <div class="card">
                     <div class="card-header">
-                        <h5>Application ID : {{ reschedule.application_id }}</h5>
+                        <span>Application ID : </span><a href="{% url 'detail-interview-show' reschedule.interview_application_id %}">{{ reschedule.interview_application_id }}</a>
                     </div>
                     <div class="card-body">
-                        {% if reschedule.interview_type == 1 %}
-                        <p>Type Of Interview : HR </p>
-                        {% elif reschedule.interview_type == 2 %}
-                        <p>Type Of Interview : Technical </p>
-                        {% else %}
-                        <p>Type Of Interview : Other </p>
-                        {% endif %}
-                        <hr>
                         <p>Reason : {{ reschedule.reason }}</p>
-                        <a type="submit" class="btn btn-outline-info">Reschedule Interview</a>
+                        <a href="{% url 'reschedule-interview' reschedule.interview_application_id %}" class="btn btn-outline-info">Reschedule Interview</a>
                     </div>
                 </div>
             {% endfor %}

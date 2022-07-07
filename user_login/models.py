@@ -117,7 +117,7 @@ class InterviewerFeedback(models.Model):
 
 class UserFeedback(models.Model):
     examiner = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='Examiner', default=1)
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='User' , default=1)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='User', default=1)
     feedback = models.CharField(max_length=300, null=False, default='You are good enough but you need little bit '
                                                                     'improvement')
     marks = models.FloatField(default=0)
@@ -126,10 +126,10 @@ class UserFeedback(models.Model):
 
 class RescheduleRequests(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='user')
-    application = models.ForeignKey(UserInterview, on_delete=models.CASCADE)
-    interview_type = models.IntegerField()
+    interview_application = models.ForeignKey(Interview, on_delete=models.CASCADE, related_name='Interview_Id',
+                                              default=1)
     reason = models.CharField(max_length=300)
-
+    is_rescheduled = models.BooleanField(default=False)
 
 class BlockUser(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)

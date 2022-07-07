@@ -7,7 +7,7 @@ from user_login.views import UserLogin, UserRegister, InterviewerHome, UserHome,
     ScheduleApplicantInterview, InterviewType, GetTimeSlot, ShowInterviewerScheduled, ApplicantDetails, \
     ShowDetailSchedule, DetailsInterviewer, UserMessage, CompanyMessage, InterviewerMessage, UserFeedbackView, \
     RescheduleRequest, ShowRescheduleRequests, FeedbackOfInterviewer, PostInterviewProcess, DeactivateAccount, \
-    ReactivateAccount, ReactivationUser
+    ReactivateAccount, ReactivationUser, DetailInterviewScheduleShow, RescheduleUserInterview
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth import views as auth_view
@@ -78,6 +78,9 @@ urlpatterns = [
     path('deactivate/<int:pk>', DeactivateAccount.as_view(), name='deactivate'),
     path('reactivate/', ReactivateAccount.as_view(), name='reactivate'),
     path('reactivate/user_info/', ReactivationUser.as_view(), name='reactivation'),
+    path('details_interview_schedule_show/<int:pk>', DetailInterviewScheduleShow.as_view(),
+         name='detail-interview-show'),
+    path('set_reschedule_interview/<int:pk>', RescheduleUserInterview.as_view(), name='reschedule-interview'),
 ]
 
 if settings.DEBUG:

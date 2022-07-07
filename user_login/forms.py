@@ -66,3 +66,9 @@ class UserFeedbackByInterviewer(forms.ModelForm):
     class Meta:
         model = UserFeedback
         fields = ['marks', 'feedback']
+
+
+class RescheduleTime(forms.ModelForm):
+    class Meta:
+        model = Interview
+        fields = ['interview_time']

@@ -1,4 +1,4 @@
-$(document).ready(function(){
+ $(document).ready(function(){
     $(".remove_job").click(function(){
         var job_id = $(this).attr("data-job_id")
         var csrf_token = $('input[name="csrfmiddlewaretoken"]').val()

@@ -16,7 +16,7 @@ from rest_framework.decorators import permission_classes
 from rest_framework.permissions import IsAdminUser
 
 from user_login.forms import UpdateUserDetailForm, UpdateInterviewerDetailForm, UserEmailUpdateForm, UpdateJobOpenings, \
-    ScheduleInterviews, UserFeedbackByInterviewer
+    ScheduleInterviews, UserFeedbackByInterviewer, RescheduleTime
 from user_login.models import CustomUser, CompanyAcceptance, UserDetails, InterviewerCompany, JobOpenings, \
     InterviewerType, InterviewerDetails, UserJobApplied, UserInterview, Interview, Notification, InterviewerFeedback, \
     RescheduleRequests, UserFeedback
@@ -266,7 +266,6 @@ class InterviewerDetailsForm(LoginRequiredMixin, View):
 
 
 class JobLists(LoginRequiredMixin, View):
-
 
     def get(self, request, *args, **kwargs):
         job_lists = JobOpenings.objects.all()
@@ -783,18 +782,18 @@ class RescheduleRequest(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         user = request.user
         application_id = kwargs['pk']
-        application = UserInterview.objects.get(id=application_id)
-        type = request.POST['reschedule_type']
+        application = Interview.objects.get(id=application_id)
         reason = request.POST['reschedule_reason']
-        request_rescheduling = RescheduleRequests.objects.create(user=user, application=application,
-                                                                 interview_type=type, reason=reason)
+        request_rescheduling = RescheduleRequests.objects.create(user=user, interview_application=application,
+                                                                 reason=reason)
         request_rescheduling.save()
-        return redirect('detail-schedule', pk=application.job_application_id)
+        return redirect('detail-schedule', pk=application.application.job_application_id)
 
 
 class ShowRescheduleRequests(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
-        reschedule = RescheduleRequests.objects.filter(application__job_application__job__company=request.user)
+        reschedule = RescheduleRequests.objects.filter(
+            interview_application_id__application__job_application__job__company=request.user, is_rescheduled=False)
         return render(request, 'user_login/show_reschedule_request.html', {'reschedule_requests': reschedule})
 
 
@@ -827,18 +826,19 @@ class ReactivateAccount(View):
         email = request.POST['email']
         domain = request.build_absolute_uri('/')[:-1]
         url = f"{domain}/reactivate/user_info/"
-        send_mail('Reactivate Your Account', url, from_email=os.getenv('EMAIL_HOST_USER'),recipient_list=[email], fail_silently=False, )
+        send_mail('Reactivate Your Account', url, from_email=os.getenv('EMAIL_HOST_USER'), recipient_list=[email],
+                  fail_silently=False, )
         return redirect('login')
 
 
 class ReactivationUser(View):
     def get(self, request, *args, **kwargs):
-        return render(request,'user_login/reactivation_page.html')
+        return render(request, 'user_login/reactivation_page.html')
 
     def post(self, request, *args, **kwargs):
         username = request.POST['username']
         password = request.POST['password']
-        user = authenticate(username=username , password=password)
+        user = authenticate(username=username, password=password)
         if user is not None:
             user_status = CustomUser.objects.get(id=user.id)
             user_status.is_activated = True
@@ -846,3 +846,40 @@ class ReactivationUser(View):
             return redirect('login')
         else:
             return redirect('')
+
+
+class DetailInterviewScheduleShow(View):
+    def get(self, request, *args, **kwargs):
+        interview = Interview.objects.get(id=kwargs['pk'])
+        return render(request, 'user_login/interview_details_application.html', {'interview': interview})
+
+
+### AJAX Required ###
+class RescheduleUserInterview(View):
+    def get(self, request, *args, **kwargs):
+        interviewer = Interview.objects.get(id=kwargs['pk'])
+        form = RescheduleTime
+        return render(request, 'user_login/reschedule_user_interview.html', {'interviewer': interviewer, 'form': form})
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class RescheduleGetTimeSlot(View):
+    def post(self, request, *args, **kwargs):
+        time_slots = ['09:00–09:30', '10:00–10:30', '11:00–11:30', '12:00–12:30', '13:00–13:30',
+                      '14:00–14:30', '15:00–15:30', '16:00–16:30', '17:00–17:30']
+        request_data = request.read()
+        form_data = json.loads(request_data.decode('utf-8'))
+        interviewer_id = form_data.get("interviewer_id")
+        sch_date = form_data.get("sch_date")
+        applicant = form_data.get('applicant_id')
+        date_interview1 = datetime.strptime(sch_date, '%m/%d/%Y')
+        sch_date = date_interview1.strftime('%Y-%m-%d')
+        interviewer = InterviewerDetails.objects.get(interviewer_id=int(interviewer_id))
+        interview_timings = Interview.objects.filter(
+            Q(interview_date=sch_date, interviewer=interviewer) | Q(application_id=int(applicant)))
+        timing_list = []
+        for time1 in interview_timings:
+            print(time1.interview_time)
+            timing_list.append(time1.interview_time)
+        final_time_slot = list(set(time_slots) - set(timing_list))
+        return JsonResponse({'final_time_slot': final_time_slot})
