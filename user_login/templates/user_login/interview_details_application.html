@@ -1,0 +1,24 @@
+{% extends 'user_login/company_base.html' %}
+{% block title %}{% endblock title %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-2"></div>
+        <div class="col-md-8">
+            <div class="card" style="margin:10px;">
+                <div class="card-header">
+                    <h3>Application ID : {{ interview.id }}</h3>
+                </div>
+                <div class="card-body">
+                    <p>User : <span>{{ interview.application.job_application.user.username }}</span></p>
+                    <p>Company : <span>{{ interview.application.job_application.job.company.username }}</span></p>
+                    <p>Interviewer : <span>{{ interview.interviewer.interviewer.username }}</span></p>
+                    <p>Job Role : <span>{{ interview.application.job_application.job.job_role }}</span></p>
+                    <p>Interview Date : <span>{{ interview.interview_date }}</span></p>
+                    <p>Interview Time : <span>{{ interview.interview_time }}</span></p>
+                </div>
+            </div>
+        <div class="col-md-2"></div>
+    </div>
+</div>
+{% endblock content %}
