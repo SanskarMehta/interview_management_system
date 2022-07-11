@@ -8,10 +8,8 @@ $(document).on('change','#id_type_interview', function(){
            url : '/get_interviewers/',
            data: JSON.stringify(data),
             success:function(response){
-                console.log(response)
                 if(response["success"] == true){
                    var interviewers = response.interviewers
-                   console.log(interviewers)
                     var select_html = ''
                     select_html += "<option value=''>-- Select --</option>"
                     $(interviewers).each(function( i ){
@@ -36,7 +34,6 @@ $(document).on('click','#get_slots',function(){
             data : JSON.stringify(data),
              success:function(response){
                  var timings = response.final_time_slot
-                 console.log(timings)
                  $("#div_id_interview_time").show()
                  $("#interview_submit_btn").show()
                  $('#get_slots').hide()

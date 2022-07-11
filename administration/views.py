@@ -268,9 +268,7 @@ class CompanyAcceptReject(AdminLoginRequiredMixin, View):
         form_data = request.read()
         request_data = json.loads(form_data.decode('utf-8'))
         company_id = request_data.get('company_id')
-        print(company_id)
         acceptance_status = request_data.get('acceptance_status')
-        print(acceptance_status)
         if acceptance_status == "0":
             Company = CompanyAcceptance.objects.get(id=int(company_id))
             Company.is_accepted = True

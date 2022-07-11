@@ -2,7 +2,6 @@ $(document).on('click', '.cv_status', function(){
     var user_applied_job_id = $(this).attr('data-userjob_id')
     var data_status = $(this).attr('data-status')
     var csrf_token = $('input[name="csrfmiddlewaretoken"]').val()
-    console.log(user_applied_job_id)
     data = {'user_applied_job_id':user_applied_job_id, "data-status": data_status}
     $.ajax({
         type: "POST",

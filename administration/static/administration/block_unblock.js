@@ -9,7 +9,6 @@ $(document).on('click', '.block_status', function() {
         }
         else{
             data = {'user_id':user_id,'data_status':data_status,'message':message}
-            console.log(data);
             $.ajax({
                 type:"POST",
                 data : JSON.stringify(data),
@@ -26,7 +25,6 @@ $(document).on('click', '.block_status', function() {
     }
     else{
         data = {'user_id':user_id,'data_status':data_status}
-        console.log(data);
         $.ajax({
             type:"POST",
             data : JSON.stringify(data),

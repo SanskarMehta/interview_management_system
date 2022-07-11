@@ -2,7 +2,6 @@ $(document).on('click','.cv_status', function(){
     var acceptance_status = $(this).attr('data-status')
     var company_id = $(this).attr('data-company_id')
     data = {'acceptance_status':acceptance_status , 'company_id':company_id}
-    console.log(data);
     $.ajax({
         type : 'POST',
         url : '/administration/company_accept_reject/',

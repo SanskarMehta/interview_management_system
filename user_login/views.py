@@ -237,10 +237,8 @@ class CompanyAddInterviewer(CompanyLoginRequiredMixin, View):
                 interviewer_company = InterviewerCompany.objects.create(company=company, interviewer=interviewer)
                 interviewer_company.save()
                 email_message = 'Hiii \n I am sending your credentials of portal login and after login please fill your details and if you want then please change your password also.\nThank You.\n ID: ' + email + " Password: " + password + "."
-                print(request.user.email)
-                a = send_mail('Interviewer Credentials', email_message, request.user.email, [email],
+                send_mail('Interviewer Credentials', email_message, request.user.email, [email],
                               fail_silently=False, )
-                print(a)
                 return redirect('show-interviewers')
         else:
             messages.info(request, "Your password's are not matching so you unable to create account.")
@@ -267,7 +265,6 @@ class InterviewerDetailsForm(InterviewerLoginRequiredMixin, View):
         job_role = request.POST['job_role']
         experience = request.POST['experience']
         type_of_interviewer_str = request.POST['interviewer_type']
-        # print(type(type_of_interviewer_str))
         type_of_interviewer = InterviewerType.objects.get(type=type_of_interviewer_str)
         interviewer = InterviewerDetails.objects.create(interviewer=request.user, type_interviewer=type_of_interviewer,
                                                         interviewer_phone=phone_number,
@@ -289,7 +286,6 @@ class JobLists(UserLoginRequiredMixin, View):
 class JobListsApply(UserLoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         job_lists = JobOpenings.objects.all()
-        print(self.kwargs)
         id1 = self.kwargs['pk']
         company = JobOpenings.objects.get(id=id1)
         if company is not None:
@@ -472,10 +468,8 @@ class UpdateUserDetails(UserLoginRequiredMixin, View):
             form.save()
             if form2.is_valid():
                 form2.save()
-                # messages.success(request,'Succefully Updated the Values and Email')
                 return redirect('user-profile')
             else:
-                # messages.success(request,'Succefully Updated the Values')
                 return redirect('user-profile')
         else:
             return redirect('user-update-profile')
@@ -494,10 +488,8 @@ class UpdateInterviewerDetails(InterviewerLoginRequiredMixin, View):
             form1.save()
             if form2.is_valid():
                 form2.save()
-                # messages.success(request,'Succesfully Updated the Email and other fields')
                 return redirect('interviewer-profile')
             else:
-                # messages.success(request,'Succefully changed the values')
                 return redirect('interviewer-profile')
         else:
             return redirect('interviewer-update-profile')
@@ -530,7 +522,7 @@ class ShowAppliedUser(CompanyLoginRequiredMixin, View):
                 data['user_phone'] = user_details.user_phone
                 data['user_CV'] = user_details.user_CV
             except UserDetails.DoesNotExist as err:
-                print(err)
+                pass
             applicant_details.append(data)
         return render(request, 'user_login/show_applied_user.html', {'applicants': applicant_details})
 
@@ -625,7 +617,6 @@ class ScheduleApplicantInterview(CompanyLoginRequiredMixin, View):
                                    'application status. '
             email_subject = "Technical Interview Schedule"
             email_message = "Your Technical interview is scheduled on Date : " + date_interview + " Time: " + time_interview + "."
-        # print(application.job_application.user)
         message = Notification.objects.create(sender=request.user, receiver=application.job_application.user,
                                               message=notification_message)
         message.save()
@@ -634,10 +625,8 @@ class ScheduleApplicantInterview(CompanyLoginRequiredMixin, View):
         message.save()
         user_email = application.job_application.user.email
         interviewer_email = interviewer.interviewer.email
-        # print(request.user.email)
-        a = send_mail(email_subject, email_message, request.user.email, [user_email, interviewer_email],
+        send_mail(email_subject, email_message, request.user.email, [user_email, interviewer_email],
                       fail_silently=False, )
-        # print(a)
         return redirect('show-accepted-applicants')
 
 
@@ -653,8 +642,6 @@ class InterviewType(View):
             examiners = InterviewerDetails.objects.select_related('interviewer').filter(
                 interviewer=interviewer.interviewer, type_interviewer_id=type_interview_id)
             for examiner in examiners:
-                print('id', examiner.interviewer.id)
-                print('username', examiner.interviewer.username)
                 data = {'id': examiner.interviewer.id, 'username': examiner.interviewer.username}
                 interviewers_list.append(data)
         return JsonResponse({"success": True, 'interviewers': interviewers_list})
@@ -677,7 +664,6 @@ class GetTimeSlot(View):
             Q(interview_date=sch_date, interviewer=interviewer) | Q(application_id=int(applicant)))
         timing_list = []
         for time1 in interview_timings:
-            print(time1.interview_time)
             timing_list.append(time1.interview_time)
         final_time_slot = list(set(time_slots) - set(timing_list))
         return JsonResponse({'final_time_slot': final_time_slot})
@@ -702,9 +688,7 @@ class ApplicantDetails(InterviewerLoginRequiredMixin, View):
 class ShowDetailSchedule(UserLoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         user_interview = UserInterview.objects.get(job_application_id=kwargs['pk'])
-        print(user_interview)
         interviews = Interview.objects.filter(application=user_interview)
-        print(interviews)
         return render(request, 'user_login/detail_interview_schedule.html', {'interviews': interviews})
 
 
@@ -763,9 +747,7 @@ class FeedbackOfInterviewer(InterviewerLoginRequiredMixin, View):
 
     def post(self, request, *args, **kwargs):
         form = UserFeedbackByInterviewer(request.POST)
-        print(request.POST)
         if form.is_valid():
-            print('1')
             application_id = request.POST.get('application')
             application = UserInterview.objects.get(id=application_id)
             username = request.POST.get('user')
@@ -776,19 +758,14 @@ class FeedbackOfInterviewer(InterviewerLoginRequiredMixin, View):
             user_process = UserFeedback.objects.create(examiner=interviewer, user=user, feedback=feedback,
                                                        marks=marks, application=application)
             user_process.save()
-            print('2')
             application = UserInterview.objects.get(id=kwargs['pk'])
             interviewer = InterviewerDetails.objects.get(interviewer=request.user)
             if interviewer.type_interviewer_id == 4:
-                print('3')
                 application.HR_round = request.POST.get('application_status')
                 application.save()
-                print('4')
             else:
-                print('5')
                 application.technical_round = request.POST.get('application_status')
                 application.save()
-                print('6')
             return redirect('post-interview-application')
         else:
             return redirect('post-interview')
@@ -833,7 +810,6 @@ class PostInterviewProcess(InterviewerLoginRequiredMixin, View):
 
 class DeactivateAccount(View):
     def get(self, request, *args, **kwargs):
-        print(kwargs['pk'])
         CustomUser.objects.filter(id=kwargs['pk']).update(is_activated=False)
         logout(request)
         return redirect('login')
@@ -927,7 +903,6 @@ class RescheduleGetTimeSlot(View):
                                                                        application_id=int(applicant)))
         timing_list = []
         for time1 in interview_timings:
-            print(time1.interview_time)
             timing_list.append(time1.interview_time)
         final_time_slot = list(set(time_slots) - set(timing_list))
         return JsonResponse({'final_time_slot': final_time_slot})
@@ -967,6 +942,5 @@ class CollectFinalStatus(View):
         message = Notification.objects.create(sender=request.user, receiver=user.job_application.user,
                                               message=notification_message)
         message.save()
-        print('1')
         send_mail('Employment Status', notification_message, request.user.email, [user.job_application.user.email])
         return JsonResponse({'message': messages})
