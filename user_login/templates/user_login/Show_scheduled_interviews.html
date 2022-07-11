@@ -1,0 +1,44 @@
+{% extends 'user_login/company_base.html' %}
+{% block title %}{% endblock title %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-2"></div>
+        <div class="col-md-8">
+            {% if interviews|length < 1 %}
+                <div class="alert alert-warning">
+                    There are no scheduled Interviews.
+                </div>
+            {% else %}
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Interviewer Name</th>
+                            <th>Applicant Name</th>
+                            <th>Interview Type</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for interview in interviews %}
+                            <tr>
+                                <th>{{ interview.id }}</th>
+                                <th>{{ interview.interviewer.interviewer.username }}</th>
+                                <th>{{ interview.application.job_application.user.username }}</th>
+                                <th>
+                                    {% if interview.type_interview_id == 4 %}
+                                        HR
+                                    {% else %}
+                                        Technical
+                                    {% endif %}
+                                </th>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
+        </div>
+        <div class="col-md-2"></div>
+    </div>
+</div>
+{% endblock content %}

@@ -11,6 +11,7 @@ from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
 
+from user_login.custommixin import AdminLoginRequiredMixin
 from user_login.forms import UpdateUserDetailForm, UserEmailUpdateForm
 from user_login.models import CustomUser, InterviewerDetails, CompanyAcceptance, UserDetails, InterviewerCompany, \
     Notification, BlockUser
@@ -27,6 +28,7 @@ class AdminLogin(View):
     """
     This view is for login view and,it verifies whether user is admin or not.
     """
+
     def get(self, request, *args, **kwargs):
         return render(request, 'administration/login.html')
 
@@ -46,56 +48,61 @@ class AdminLogin(View):
         return render(request, 'administration/login.html')
 
 
-class AdminAfterLogin(LoginRequiredMixin, View):
+class AdminAfterLogin(AdminLoginRequiredMixin, View):
     """
     This view is called after user succefully logged in as a Admin
     """
+
     def get(self, request, *args, **kwargs):
         return render(request, 'administration/admin_home.html')
 
 
-class ShowInterviewersAdmin(View):
+class ShowInterviewersAdmin(AdminLoginRequiredMixin, View):
     """
     This view is used to show all interviewers.
     interviewers -> list : It is a collection of InterviewerDetails objects.
     """
+
     def get(self, request, *args, **kwargs):
         interviewers = InterviewerDetails.objects.all()
         return render(request, 'administration/ShowInterviewers.html', {'interviewers': interviewers})
 
 
-class ShowUser(View):
+class ShowUser(AdminLoginRequiredMixin, View):
     """
     This view is used to show all Users.
     Users -> list : It is a collection of User objects.
     """
+
     def get(self, request, *args, **kwargs):
         Users = CustomUser.objects.filter(is_company=False, is_interviewer=False, is_superuser=False)
         return render(request, 'administration/ShowUsers.html', {'users': Users})
 
 
-class ShowCompany(View):
+class ShowCompany(AdminLoginRequiredMixin, View):
     """
     This view is used to show all Companies.
     company -> list : It is a collection of objects of CompanyAcceptance where all companies are exist.
     """
+
     def get(self, request, *args, **kwargs):
         company = CompanyAcceptance.objects.select_related('company').all()
         return render(request, 'administration/ShowCompanies.html', {'companies': company})
 
 
-class DetailsOfUser(View):
+class DetailsOfUser(AdminLoginRequiredMixin, View):
     """
     This view is used to show the details of specific user.Also provide the block and unblock functionality.
     user_details -> object : It is an object of UserDetails where all the details of user exist.
     kwargs['pk'] -> int : It is a id of User , using which we get the details of that particular user.
     """
+
     def get(self, request, *args, **kwargs):
         user_details = UserDetails.objects.get(user_id=kwargs['pk'])
         return render(request, 'administration/DetailsUser.html', {'user_detail': user_details})
 
 
-class DetailsOfInterviewer(View):
+class DetailsOfInterviewer(AdminLoginRequiredMixin, View):
     """
     This view is used to show the details of specific user.
     interviewer_details -> object : It is an object of InterviewerDetails where all the details of particular Interviewer exist.
@@ -103,6 +110,7 @@ class DetailsOfInterviewer(View):
     kwargs['pk'] -> It is a id of InterviewerDetails , using which we get the details of that particular Interviewer
     interviewer_details.interviewer -> object : This object is used to find th another object from the InterviewerCompany.
     """
+
     def get(self, request, *args, **kwargs):
         interviewer_details = InterviewerDetails.objects.get(id=kwargs['pk'])
         company_name = InterviewerCompany.objects.get(interviewer=interviewer_details.interviewer)
@@ -110,7 +118,7 @@ class DetailsOfInterviewer(View):
                       {'interviewer_detail': interviewer_details, 'company': company_name.company.username})
 
 
-class CompanyRegisterByAdmin(View):
+class CompanyRegisterByAdmin(AdminLoginRequiredMixin, View):
     """
     This view is used to register a new company by the Admin.
     username -> str : It holds the username which is retrieved from the html side.
@@ -118,6 +126,7 @@ class CompanyRegisterByAdmin(View):
     password -> str : It holds the password which is retrieved from the html side.
     password2 -> str : It holds the confirm-password which is retrieved from the html side.
     """
+
     def get(self, request, *args, **kwargs):
         return render(request, 'administration/user_register.html')
 
@@ -148,7 +157,7 @@ class CompanyRegisterByAdmin(View):
             return render(request, 'administration/user_register.html')
 
 
-class UserRegisterByAdmin(View):
+class UserRegisterByAdmin(AdminLoginRequiredMixin, View):
     """
     This view is used to register a new user by the Admin.
     username -> str : It holds the username which is retrieved from the html side.
@@ -156,6 +165,7 @@ class UserRegisterByAdmin(View):
     password -> str : It holds the password which is retrieved from the html side.
     password2 -> str : It holds the confirm-password which is retrieved from the html side.
     """
+
     def get(self, request, *args, **kwargs):
         return render(request, 'administration/user_register.html')
 
@@ -180,22 +190,24 @@ class UserRegisterByAdmin(View):
             return render(request, 'administration/user_register.html')
 
 
-class CompanyAcceptanceByAdmin(View):
+class CompanyAcceptanceByAdmin(AdminLoginRequiredMixin, View):
     """
     This view shows the all non-accepted companies by the Admin.
     companies -> list : It is a collection of objects of CompanyAcceptance where companies are not accepted
     """
+
     def get(self, reqeust, *args, **kwargs):
         companies = CompanyAcceptance.objects.filter(is_accepted=False)
         return render(reqeust, 'administration/company_accept.html', {'companies': companies})
 
 
-class AdminUpdateUserDetails(LoginRequiredMixin, View):
+class AdminUpdateUserDetails(AdminLoginRequiredMixin, View):
     """
     This view is used for updating the details of Admin Profile.
     form -> form : It is used to update the data of admin details
     form2 -> form : It is used to update the email of Admin
     """
+
     def get(self, request, *args, **kwargs):
         form = UpdateUserDetailForm(instance=request.user.userdetails)
         form2 = UserEmailUpdateForm(instance=request.user)
@@ -218,12 +230,13 @@ class AdminUpdateUserDetails(LoginRequiredMixin, View):
 
 
 @method_decorator(csrf_exempt, name='dispatch')
-class BlockUnblock(LoginRequiredMixin, View):
+class BlockUnblock(AdminLoginRequiredMixin, View):
     """
     This is used for blocking and unblocking the user and company using AJAX
     user_id -> int : This is the id of the company or User which is used for blocking/unblocking.
     block_status -> str : This is used for whether admin requested for block("1") or unblock("0").
     """
+
     def post(self, request, *args, **kwargs):
         request_data = request.read()
         form_data = json.loads(request_data.decode('utf-8'))
@@ -244,13 +257,14 @@ class BlockUnblock(LoginRequiredMixin, View):
         return JsonResponse({'message': 'Completed Successfully'})
 
 
-@method_decorator(csrf_exempt,name='dispatch')
-class CompanyAcceptReject(LoginRequiredMixin,View):
+@method_decorator(csrf_exempt, name='dispatch')
+class CompanyAcceptReject(AdminLoginRequiredMixin, View):
     """
     This view is used for accepting or rejecting the company request.
     company_id -> int : This is used for company id , which is used in accepting/rejecting request.
     """
-    def post(self,request, *args , **kwargs):
+
+    def post(self, request, *args, **kwargs):
         form_data = request.read()
         request_data = json.loads(form_data.decode('utf-8'))
         company_id = request_data.get('company_id')
@@ -258,11 +272,11 @@ class CompanyAcceptReject(LoginRequiredMixin,View):
         acceptance_status = request_data.get('acceptance_status')
         print(acceptance_status)
         if acceptance_status == "0":
-            Company=CompanyAcceptance.objects.get(id=int(company_id))
+            Company = CompanyAcceptance.objects.get(id=int(company_id))
             Company.is_accepted = True
             Company.save()
         else:
-            Company=CompanyAcceptance.objects.get(id=int(company_id))
+            Company = CompanyAcceptance.objects.get(id=int(company_id))
             Company.is_accepted = False
             Company.save()
-        return JsonResponse({'msg':'Thank You for choosing us'})
+        return JsonResponse({'msg': 'Thank You for choosing us'})

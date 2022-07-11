@@ -14,8 +14,8 @@
             <form method="POST">
                 {% csrf_token %}
                 <div>
-                    <input type="hidden" id="applicant_id" data-application_id="{{ interviewer.application_id }}">
-                    <input type="hidden" id="interviewer_id" data-interviewer_id="{{ interviewer.interviewer.interviewer.id }}">
+                    <input type="hidden" id="applicant_id" data-application_id="{{ interviewer.application_id }}" value="{{ interviewer.application_id }}" name="applicant_id">
+                    <input type="hidden" id="interviewer_id" data-interviewer_id="{{ interviewer.interviewer.id }}" value="{{ interviewer.interviewer.id }}" name="interviewer_id">
                     <span>Interviewer : </span><span>{{ interviewer.interviewer.interviewer.username }}</span>
                 </div>
                 <p></p>
@@ -30,8 +30,8 @@
                 </div>
                 <p></p>
                 <p></p>
+                <input type="submit" value="Submit" class="btn btn-outline-info">
             </form>
-            <input type="submit" value="Submit" class="btn btn-outline-info">
         </div>
         <div class="col-md-2"></div>
     </div>

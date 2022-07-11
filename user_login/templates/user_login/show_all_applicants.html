@@ -1,0 +1,52 @@
+{% extends 'user_login/company_base.html' %}
+{% load static %}
+{% block title %}Show Selected Applicants{% endblock title %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-2"></div>
+        <div class="col-md-8">
+            <h3>Employee Accept/Reject Status</h3>
+            {% if applicants|length < 1 %}
+                <div class="alert alert-danger">
+                    There are no applicants who cleared both interviews.
+                </div>
+            {% else %}
+                {% for applicant in applicants %}
+                <div class="card" style="margin:10px;">
+                    <div class="card-header">
+                        <h3>Application ID : {{ applicant.id }}</h3>
+                    </div>
+                    <div class="card-body">
+                        <div>
+                            <span>Applicant Name : {{ applicant.job_application.user.username }}</span>
+                        </div>
+                        <p></p>
+                        <div>
+                            <span>Job Role : {{ applicant.job_application.job.job_role }}</span>
+                        </div>
+                        <p></p>
+                        <div>
+                            <span>Technical Status : {{ applicant.technical_round }}</span>
+                        </div>
+                        <p></p>
+                        <div>
+                            <span>HR Status : {{ applicant.HR_round }}</span>
+                        </div>
+                        <hr>
+                        <div class="accept_reject_btn">
+                            <input type="button" data-value="1" value="Accept" data-user_id="{{ applicant.id }}" class="btn btn-outline-success accept_reject_status acceptance_status_{{ applicant.id }}">
+                            <input type="button" data-value="0" value="Reject" data-user_id="{{ applicant.id }}" class="btn btn-outline-danger accept_reject_status acceptance_status_{{ applicant.id }}">
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+        <div class="col-md-2"></div>
+    </div>
+</div>
+{% endblock content %}
+{% block jquery %}
+<script src="{% static 'user_login/js/final_acceptance.js' %}"></script>
+{% endblock jquery %}

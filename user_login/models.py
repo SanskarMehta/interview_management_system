@@ -27,7 +27,7 @@ class UserDetails(models.Model):
     user_10th_marks = models.FloatField()
     user_CPI = models.FloatField()
     user_CV = models.FileField(upload_to='CV/', validators=[FileExtensionValidator(['pdf', 'doc', 'docx'])])
-    accepted_status = models.BooleanField(default=False)
+    accepted_status = models.BooleanField(null=True)
 
 
 class JobOpenings(models.Model):
@@ -82,6 +82,12 @@ class UserInterview(models.Model):
     )
     technical_round = models.CharField(max_length=15, choices=round_choices, default='Pending')
     HR_round = models.CharField(max_length=15, choices=round_choices, default='Pending')
+    selection_choices = (
+        ('Accepted', 'Accepted'),
+        ('Rejected', 'Rejected'),
+        ('Pending', 'Pending'),
+    )
+    selection_status = models.CharField(max_length=20, choices=selection_choices, default='Pending')
 
 
 class Interview(models.Model):
@@ -130,6 +136,7 @@ class RescheduleRequests(models.Model):
                                               default=1)
     reason = models.CharField(max_length=300)
     is_rescheduled = models.BooleanField(default=False)
+
 
 class BlockUser(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)

@@ -1,13 +1,14 @@
 from django.urls import path
 from user_login.views import UserLogin, UserRegister, InterviewerHome, UserHome, CompanyHome, CompanyRegister, \
     UserDetailsForm, CompanyJobOpenings, HomeView, CompanyAddInterviewer, InterviewerDetailsForm, JobListsApply, \
-    AfterJobApply, UserChangePassword, CompanyChangePassword, InterviewerChangePassword, CompanyCareer, JobLists, \
+    UserChangePassword, CompanyChangePassword, InterviewerChangePassword, CompanyCareer, JobLists, \
     UserAppliedJobs, UserProfile, InterviewerProfile, ShowInterviewers, UpdateUserDetails, \
     UpdateInterviewerDetails, ShowAppliedUser, JobOpeningUpdate, ShowAcceptedInterviewers, \
     ScheduleApplicantInterview, InterviewType, GetTimeSlot, ShowInterviewerScheduled, ApplicantDetails, \
     ShowDetailSchedule, DetailsInterviewer, UserMessage, CompanyMessage, InterviewerMessage, UserFeedbackView, \
     RescheduleRequest, ShowRescheduleRequests, FeedbackOfInterviewer, PostInterviewProcess, DeactivateAccount, \
-    ReactivateAccount, ReactivationUser, DetailInterviewScheduleShow, RescheduleUserInterview
+    ReactivateAccount, ReactivationUser, DetailInterviewScheduleShow, RescheduleUserInterview, RescheduleGetTimeSlot, \
+    IsAcceptAsEmployee, ScheduledUsersInterviewsDisplay, CollectFinalStatus
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth import views as auth_view
@@ -27,7 +28,7 @@ urlpatterns = [
     path('company_add_interviewer/', CompanyAddInterviewer.as_view(), name='company-add-interviewer'),
     path('job_lists/', JobLists.as_view(), name='job-lists'),
     path('job_lists/<int:pk>', JobListsApply.as_view(), name='job-apply'),
-    path('after_apply/', AfterJobApply.as_view(), name='after-apply'),
+    # path('after_apply/', AfterJobApply.as_view(), name='after-apply'),
     path('user_change_password/', UserChangePassword.as_view(), name='user-change-password'),
     path('interviewer_change_password/', InterviewerChangePassword.as_view(), name='interviewer-change-password'),
     path('company_change_password/', CompanyChangePassword.as_view(), name='company-change-password'),
@@ -81,6 +82,10 @@ urlpatterns = [
     path('details_interview_schedule_show/<int:pk>', DetailInterviewScheduleShow.as_view(),
          name='detail-interview-show'),
     path('set_reschedule_interview/<int:pk>', RescheduleUserInterview.as_view(), name='reschedule-interview'),
+    path('get_reschedule_time_slot/', RescheduleGetTimeSlot.as_view(), name='get-reschedule-time-slot'),
+    path('accept_reject_applicant/', IsAcceptAsEmployee.as_view(), name='accept-reject-applicant'),
+    path('show_scheduled_interviews/', ScheduledUsersInterviewsDisplay.as_view(), name='show-scheduled-interviews'),
+    path('collect_final_status/', CollectFinalStatus.as_view(), name='collect-final-status'),
 ]
 
 if settings.DEBUG:

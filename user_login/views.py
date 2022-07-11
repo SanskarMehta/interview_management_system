@@ -10,11 +10,13 @@ from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
 from django.views import View
+from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import UpdateView, TemplateView
 from rest_framework.decorators import permission_classes
 from rest_framework.permissions import IsAdminUser
 
+from user_login.custommixin import UserLoginRequiredMixin, InterviewerLoginRequiredMixin, CompanyLoginRequiredMixin
 from user_login.forms import UpdateUserDetailForm, UpdateInterviewerDetailForm, UserEmailUpdateForm, UpdateJobOpenings, \
     ScheduleInterviews, UserFeedbackByInterviewer, RescheduleTime
 from user_login.models import CustomUser, CompanyAcceptance, UserDetails, InterviewerCompany, JobOpenings, \
@@ -28,8 +30,22 @@ class HomeView(View):
         return render(request, 'user_login/base.html')
 
 
+@method_decorator(never_cache, name='dispatch')
 class UserLogin(View):
     def get(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            if request.user.is_interviewer:
+                if request.user.is_first_time:
+                    return redirect('interviewer-details-form')
+                else:
+                    return redirect('interviewer-home')
+            elif request.user.is_company:
+                return redirect('company-home')
+            else:
+                if request.user.is_first_time:
+                    return redirect('user-details-form')
+                else:
+                    return redirect('user-home')
         return render(request, 'user_login/login.html')
 
     def post(self, request, *args, **kwargs):
@@ -58,7 +74,6 @@ class UserLogin(View):
                     else:
                         login(request, user)
                         if user.is_first_time:
-                            print(user.id)
                             return redirect('user-details-form')
                         else:
                             return redirect('user-home')
@@ -98,17 +113,17 @@ class UserRegister(View):
             return render(request, 'user_login/register.html')
 
 
-class InterviewerHome(LoginRequiredMixin, View):
+class InterviewerHome(InterviewerLoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         return render(request, 'user_login/interviewer_home.html')
 
 
-class UserHome(LoginRequiredMixin, View):
+class UserHome(UserLoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         return render(request, 'user_login/user_home.html')
 
 
-class CompanyHome(LoginRequiredMixin, View):
+class CompanyHome(CompanyLoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         return render(request, 'user_login/company_home.html')
 
@@ -144,7 +159,7 @@ class CompanyRegister(View):
             return render(request, 'user_login/company_register.html')
 
 
-class UserDetailsForm(LoginRequiredMixin, View):
+class UserDetailsForm(UserLoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         return render(request, 'user_login/user_details_form.html')
 
@@ -176,7 +191,7 @@ class UserDetailsForm(LoginRequiredMixin, View):
             return render(request, 'user_login/user_details_form.html')
 
 
-class CompanyJobOpenings(LoginRequiredMixin, View):
+class CompanyJobOpenings(CompanyLoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         company = request.user.username
         return render(request, 'user_login/company_job_opening.html', {'company': company})
@@ -197,7 +212,7 @@ class CompanyJobOpenings(LoginRequiredMixin, View):
         return redirect('company-career')
 
 
-class CompanyAddInterviewer(LoginRequiredMixin, View):
+class CompanyAddInterviewer(CompanyLoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         company = request.user.username
         return render(request, 'user_login/company_add_interviewer.html', {'company': company})
@@ -234,7 +249,7 @@ class CompanyAddInterviewer(LoginRequiredMixin, View):
         return render(request, 'user_login/company_add_interviewer.html', {'company': company})
 
 
-class InterviewerDetailsForm(LoginRequiredMixin, View):
+class InterviewerDetailsForm(InterviewerLoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         InterviewerTypes = InterviewerType.objects.all()
         list1 = []
@@ -265,14 +280,13 @@ class InterviewerDetailsForm(LoginRequiredMixin, View):
         return redirect('interviewer-home')
 
 
-class JobLists(LoginRequiredMixin, View):
-
+class JobLists(UserLoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         job_lists = JobOpenings.objects.all()
         return render(request, 'user_login/job_lists.html', {'job_lists': job_lists})
 
 
-class JobListsApply(LoginRequiredMixin, View):
+class JobListsApply(UserLoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         job_lists = JobOpenings.objects.all()
         print(self.kwargs)
@@ -289,13 +303,13 @@ class JobListsApply(LoginRequiredMixin, View):
         return render(request, 'user_login/job_lists.html', {'job_lists': job_lists})
 
 
-class AfterJobApply(LoginRequiredMixin, View):
-    def get(self, request, *args, **kwargs):
-        username = request.user.username
-        return render(request, 'user_login/after_apply.html', {'Username': username})
+# class AfterJobApply(LoginRequiredMixin, View):
+#     def get(self, request, *args, **kwargs):
+#         username = request.user.username
+#         return render(request, 'user_login/after_apply.html', {'Username': username})
 
 
-class UserChangePassword(LoginRequiredMixin, View):
+class UserChangePassword(UserLoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         username = request.user.username
         return render(request, 'user_login/user_change_password.html', {'username': username})
@@ -322,7 +336,7 @@ class UserChangePassword(LoginRequiredMixin, View):
         return render(request, 'user_login/user_change_password.html', {'username': request.user.username})
 
 
-class CompanyChangePassword(LoginRequiredMixin, View):
+class CompanyChangePassword(CompanyLoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         username = request.user.username
         return render(request, 'user_login/company_change_password.html', {'username': username})
@@ -349,7 +363,7 @@ class CompanyChangePassword(LoginRequiredMixin, View):
         return render(request, 'user_login/company_change_password.html', {'username': request.user.username})
 
 
-class InterviewerChangePassword(LoginRequiredMixin, View):
+class InterviewerChangePassword(InterviewerLoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         username = request.user.username
         return render(request, 'user_login/interviewer_change_password.html', {'username': username})
@@ -377,7 +391,7 @@ class InterviewerChangePassword(LoginRequiredMixin, View):
         return render(request, 'user_login/interviewer_change_password.html', {'username': request.user.username})
 
 
-class CompanyCareer(LoginRequiredMixin, View):
+class CompanyCareer(CompanyLoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         jobs = JobOpenings.objects.filter(company=request.user)
         return render(request, 'user_login/company_career.html', {'jobs': jobs})
@@ -391,19 +405,19 @@ class CompanyCareer(LoginRequiredMixin, View):
         return JsonResponse({"success": True, "message": "Job Deleted Successfully"})
 
 
-class UserAppliedJobs(LoginRequiredMixin, View):
+class UserAppliedJobs(UserLoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         jobs = UserJobApplied.objects.filter(user=request.user)
         return render(request, 'user_login/user_job_applied.html', {'jobs': jobs})
 
 
-class UserProfile(LoginRequiredMixin, View):
+class UserProfile(UserLoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         user_details = UserDetails.objects.filter(user=request.user)
         return render(request, 'user_login/user_profile.html', {'user_details': user_details})
 
 
-class InterviewerProfile(LoginRequiredMixin, View):
+class InterviewerProfile(InterviewerLoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         company_name = InterviewerCompany.objects.get(interviewer=request.user)
         interviewer_details = InterviewerDetails.objects.filter(interviewer=request.user)
@@ -412,7 +426,7 @@ class InterviewerProfile(LoginRequiredMixin, View):
 
 
 @method_decorator(csrf_exempt, name='dispatch')
-class ShowInterviewers(LoginRequiredMixin, View):
+class ShowInterviewers(CompanyLoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         interviewers = InterviewerCompany.objects.select_related("interviewer").filter(company=request.user)
         interviewer_list = []
@@ -445,7 +459,7 @@ class ShowInterviewers(LoginRequiredMixin, View):
         return JsonResponse({"success": True, "message": "Interviewer Deleted Successfully"})
 
 
-class UpdateUserDetails(LoginRequiredMixin, View):
+class UpdateUserDetails(UserLoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         form = UpdateUserDetailForm(instance=request.user.userdetails)
         form2 = UserEmailUpdateForm(instance=request.user)
@@ -467,7 +481,7 @@ class UpdateUserDetails(LoginRequiredMixin, View):
             return redirect('user-update-profile')
 
 
-class UpdateInterviewerDetails(LoginRequiredMixin, View):
+class UpdateInterviewerDetails(InterviewerLoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         form1 = UpdateInterviewerDetailForm(instance=request.user.interviewerdetails)
         form2 = UserEmailUpdateForm(instance=request.user)
@@ -489,7 +503,7 @@ class UpdateInterviewerDetails(LoginRequiredMixin, View):
             return redirect('interviewer-update-profile')
 
 
-class ShowAppliedUser(LoginRequiredMixin, View):
+class ShowAppliedUser(CompanyLoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         applicants = UserJobApplied.objects.select_related('job', 'user').filter(job__company=request.user)
         applicant_details = []
@@ -548,7 +562,7 @@ class ShowAppliedUser(LoginRequiredMixin, View):
         return JsonResponse({'success': True, 'message': 'Interviewer Deleted Successfully'})
 
 
-class JobOpeningUpdate(LoginRequiredMixin, View):
+class JobOpeningUpdate(CompanyLoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         company = JobOpenings.objects.filter(id=self.kwargs['pk']).first()
         form1 = UpdateJobOpenings(instance=company)
@@ -569,13 +583,13 @@ class JobOpeningUpdate(LoginRequiredMixin, View):
         return render(request, 'user_login/company_job_openings_update.html', {'form1': form1})
 
 
-class ShowAcceptedInterviewers(LoginRequiredMixin, View):
+class ShowAcceptedInterviewers(CompanyLoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         applicants = UserInterview.objects.filter(job_application__job__company=request.user)
         return render(request, 'user_login/schedule_interviews.html', {'applicants': applicants})
 
 
-class ScheduleApplicantInterview(LoginRequiredMixin, View):
+class ScheduleApplicantInterview(CompanyLoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         form1 = ScheduleInterviews(request.GET)
         return render(request, 'user_login/technical_interview_form.html', {'form': form1, 'pk': kwargs.get('pk')})
@@ -620,10 +634,10 @@ class ScheduleApplicantInterview(LoginRequiredMixin, View):
         message.save()
         user_email = application.job_application.user.email
         interviewer_email = interviewer.interviewer.email
-        print(request.user.email)
+        # print(request.user.email)
         a = send_mail(email_subject, email_message, request.user.email, [user_email, interviewer_email],
                       fail_silently=False, )
-        print(a)
+        # print(a)
         return redirect('show-accepted-applicants')
 
 
@@ -669,14 +683,14 @@ class GetTimeSlot(View):
         return JsonResponse({'final_time_slot': final_time_slot})
 
 
-class ShowInterviewerScheduled(LoginRequiredMixin, View):
+class ShowInterviewerScheduled(InterviewerLoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         interviewer = InterviewerDetails.objects.get(interviewer=request.user)
         interview_schedule = Interview.objects.filter(interviewer=interviewer)
         return render(request, 'user_login/interviewer_schedule.html', {'interview_schedule': interview_schedule})
 
 
-class ApplicantDetails(LoginRequiredMixin, View):
+class ApplicantDetails(InterviewerLoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         applicant_details = UserInterview.objects.get(id=kwargs['pk'])
         user_details = UserDetails.objects.select_related('user').get(user_id=applicant_details.job_application.user_id)
@@ -685,7 +699,7 @@ class ApplicantDetails(LoginRequiredMixin, View):
                       {'user_detail': user_details, 'job_application': job_application})
 
 
-class ShowDetailSchedule(LoginRequiredMixin, View):
+class ShowDetailSchedule(UserLoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         user_interview = UserInterview.objects.get(job_application_id=kwargs['pk'])
         print(user_interview)
@@ -694,7 +708,7 @@ class ShowDetailSchedule(LoginRequiredMixin, View):
         return render(request, 'user_login/detail_interview_schedule.html', {'interviews': interviews})
 
 
-class DetailsInterviewer(LoginRequiredMixin, View):
+class DetailsInterviewer(UserLoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         interviewer_detail = InterviewerDetails.objects.get(id=kwargs['pk'])
         company_name = InterviewerCompany.objects.get(interviewer_id=interviewer_detail.interviewer.id)
@@ -702,25 +716,25 @@ class DetailsInterviewer(LoginRequiredMixin, View):
                       {'interviewer_detail': interviewer_detail, 'company': company_name.company.username})
 
 
-class UserMessage(LoginRequiredMixin, View):
+class UserMessage(UserLoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         messages = Notification.objects.filter(receiver=request.user)
         return render(request, 'user_login/user_messages.html', {'messages': messages})
 
 
-class InterviewerMessage(LoginRequiredMixin, View):
+class InterviewerMessage(InterviewerLoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         messages = Notification.objects.filter(receiver=request.user)
         return render(request, 'user_login/interviewer_messages.html', {'messages': messages})
 
 
-class CompanyMessage(LoginRequiredMixin, View):
+class CompanyMessage(CompanyLoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         messages = Notification.objects.filter(receiver=request.user)
         return render(request, 'user_login/company_messages.html', {'messages': messages})
 
 
-class UserFeedbackView(LoginRequiredMixin, View):
+class UserFeedbackView(UserLoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         interviewer = InterviewerDetails.objects.get(id=kwargs['pk'])
         return render(request, 'user_login/user_feedback.html',
@@ -740,7 +754,7 @@ class UserFeedbackView(LoginRequiredMixin, View):
         return redirect('user-job-apply')
 
 
-class FeedbackOfInterviewer(LoginRequiredMixin, View):
+class FeedbackOfInterviewer(InterviewerLoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         application = UserInterview.objects.get(id=kwargs['pk'])
         form = UserFeedbackByInterviewer
@@ -751,6 +765,7 @@ class FeedbackOfInterviewer(LoginRequiredMixin, View):
         form = UserFeedbackByInterviewer(request.POST)
         print(request.POST)
         if form.is_valid():
+            print('1')
             application_id = request.POST.get('application')
             application = UserInterview.objects.get(id=application_id)
             username = request.POST.get('user')
@@ -761,20 +776,25 @@ class FeedbackOfInterviewer(LoginRequiredMixin, View):
             user_process = UserFeedback.objects.create(examiner=interviewer, user=user, feedback=feedback,
                                                        marks=marks, application=application)
             user_process.save()
+            print('2')
             application = UserInterview.objects.get(id=kwargs['pk'])
             interviewer = InterviewerDetails.objects.get(interviewer=request.user)
             if interviewer.type_interviewer_id == 4:
+                print('3')
                 application.HR_round = request.POST.get('application_status')
                 application.save()
+                print('4')
             else:
+                print('5')
                 application.technical_round = request.POST.get('application_status')
                 application.save()
+                print('6')
             return redirect('post-interview-application')
         else:
             return redirect('post-interview')
 
 
-class RescheduleRequest(LoginRequiredMixin, View):
+class RescheduleRequest(UserLoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         return render(request, 'user_login/reschedule_request.html',
                       {'user': request.user, 'application': kwargs['pk']})
@@ -790,23 +810,24 @@ class RescheduleRequest(LoginRequiredMixin, View):
         return redirect('detail-schedule', pk=application.application.job_application_id)
 
 
-class ShowRescheduleRequests(LoginRequiredMixin, View):
+class ShowRescheduleRequests(CompanyLoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         reschedule = RescheduleRequests.objects.filter(
             interview_application_id__application__job_application__job__company=request.user, is_rescheduled=False)
         return render(request, 'user_login/show_reschedule_request.html', {'reschedule_requests': reschedule})
 
 
-class PostInterviewProcess(LoginRequiredMixin, View):
+class PostInterviewProcess(InterviewerLoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         interviewer = InterviewerDetails.objects.get(interviewer=request.user)
         if interviewer.type_interviewer_id == 4:
             interviews = Interview.objects.select_related('application').filter(
-                interviewer__interviewer=request.user).exclude(application__HR_round='Scheduled')
+                interviewer__interviewer=request.user).exclude(
+                Q(application__HR_round='Accepted') | Q(application__HR_round='Rejected'))
         else:
             interviews = Interview.objects.select_related('application').filter(
                 interviewer__interviewer=request.user).exclude(
-                Q(application__technical_round='Scheduled') | Q(application__technical_round='Rejected'))
+                Q(application__technical_round='Accepted') | Q(application__technical_round='Rejected'))
         return render(request, 'user_login/post_interview_applicants.html', {'interviews': interviews})
 
 
@@ -848,18 +869,45 @@ class ReactivationUser(View):
             return redirect('')
 
 
-class DetailInterviewScheduleShow(View):
+class DetailInterviewScheduleShow(CompanyLoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         interview = Interview.objects.get(id=kwargs['pk'])
         return render(request, 'user_login/interview_details_application.html', {'interview': interview})
 
 
-### AJAX Required ###
-class RescheduleUserInterview(View):
+class RescheduleUserInterview(CompanyLoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
-        interviewer = Interview.objects.get(id=kwargs['pk'])
+        interview_application = RescheduleRequests.objects.get(id=kwargs['pk'])
+        interviewer = Interview.objects.get(id=interview_application.interview_application.id)
         form = RescheduleTime
         return render(request, 'user_login/reschedule_user_interview.html', {'interviewer': interviewer, 'form': form})
+
+    def post(self, request, *args, **kwargs):
+        sch_date = request.POST.get('date')
+        date_interview1 = datetime.strptime(sch_date, '%Y-%m-%d')
+        date_interview = date_interview1.strftime('%Y-%m-%d')
+        time_slot = request.POST.get('interview_time')
+        interview_application = RescheduleRequests.objects.get(id=kwargs['pk'])
+        interview_reschedule = Interview.objects.get(id=interview_application.interview_application.id)
+        interview_reschedule.interview_time = time_slot
+        interview_reschedule.interview_date = date_interview
+        interview_reschedule.save()
+        interview_application.is_rescheduled = True
+        interview_application.save()
+
+        notification_message = 'Your interview is Rescheduled. To know more about it please check your ' \
+                               'application status. '
+        message = Notification.objects.create(sender=request.user,
+                                              receiver=interview_reschedule.application.job_application.user,
+                                              message=notification_message)
+        message.save()
+        notification_message = 'Your interview is Rescheduled. To know more about it please check your ' \
+                               'Interview Schedule. '
+        message = Notification.objects.create(sender=request.user,
+                                              receiver=interview_reschedule.interviewer.interviewer,
+                                              message=notification_message)
+        message.save()
+        return redirect('show-request-reschedule')
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -872,14 +920,53 @@ class RescheduleGetTimeSlot(View):
         interviewer_id = form_data.get("interviewer_id")
         sch_date = form_data.get("sch_date")
         applicant = form_data.get('applicant_id')
-        date_interview1 = datetime.strptime(sch_date, '%m/%d/%Y')
+        date_interview1 = datetime.strptime(sch_date, '%Y-%m-%d')
         sch_date = date_interview1.strftime('%Y-%m-%d')
-        interviewer = InterviewerDetails.objects.get(interviewer_id=int(interviewer_id))
         interview_timings = Interview.objects.filter(
-            Q(interview_date=sch_date, interviewer=interviewer) | Q(application_id=int(applicant)))
+            Q(interview_date=sch_date, interviewer=interviewer_id) | Q(interview_date=sch_date,
+                                                                       application_id=int(applicant)))
         timing_list = []
         for time1 in interview_timings:
             print(time1.interview_time)
             timing_list.append(time1.interview_time)
         final_time_slot = list(set(time_slots) - set(timing_list))
         return JsonResponse({'final_time_slot': final_time_slot})
+
+
+class IsAcceptAsEmployee(View):
+    def get(self, request, *args, **kwargs):
+        applicants = UserInterview.objects.filter(job_application__job__company=request.user, HR_round='Accepted',
+                                                  technical_round='Accepted', selection_status='Pending')
+        return render(request, 'user_login/show_all_applicants.html', {'applicants': applicants})
+
+
+class ScheduledUsersInterviewsDisplay(View):
+    def get(self, request, *args, **kwargs):
+        interviews = Interview.objects.filter(application__job_application__job__company=request.user)
+        return render(request, 'user_login/Show_scheduled_interviews.html', {'interviews': interviews})
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class CollectFinalStatus(View):
+    def post(self, request, *args, **kwargs):
+        request_data = request.read()
+        form_data = json.loads(request_data.decode('utf-8'))
+        application_id = form_data.get('application_id')
+        data_value = form_data.get('data_value')
+        if data_value == '1':
+            user = UserInterview.objects.get(id=int(application_id))
+            user.selection_status = 'Accepted'
+            user.save()
+            messages = 'You are Accepted'
+        else:
+            user = UserInterview.objects.get(id=int(application_id))
+            user.selection_status = 'Rejected'
+            user.save()
+            messages = 'Sorry ! You are Rejected'
+        notification_message = messages + ' in ' + str(request.user.username) + '.'
+        message = Notification.objects.create(sender=request.user, receiver=user.job_application.user,
+                                              message=notification_message)
+        message.save()
+        print('1')
+        send_mail('Employment Status', notification_message, request.user.email, [user.job_application.user.email])
+        return JsonResponse({'message': messages})

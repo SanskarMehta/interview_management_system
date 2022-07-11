@@ -8,30 +8,36 @@
             <div>
                 <h2>Interviewers List</h2>
             </div>
-            {% for interviewer in interviewer_details %}
-            <div class="card" style="margin:10px" id="{{ interviewer.id }}">
-                <div class="card-body">
-                    <h3 class="card-title"></h3>
-                    <div class="interview-wrapper" style="display: flex; justify-content:space-between;align-items: center;">
-                        <div>
-                            <span>Name : <b>{{ interviewer.name }}</b></span><br>
-                            <div class='card-body'>
-                                <label>Description : </label>
-                                <li class="card-text" style="margin-left:20px;"><span>Job Role : </span><b>{{ interviewer.job_role }}</b></li>
-                                <li class="card-text" style="margin-left:20px;"><span>Experience : </span><b>{{ interviewer.Experience }}</b></li>
-                                <li class="card-text" style="margin-left:20px;"><span>Type Interviewer : </span><b>{{ interviewer.type_interviewer }}</b></li>
-                                <li class="card-text" style="margin-left:20px;"><span>Technology : </span><b>{{ interviewer.interviewer_technology }}</b></li>
-                                <li class="card-text" style="margin-left:20px;"><span>Mobile Number : </span><b>{{ interviewer.interviewer_phone }}</b></li>
-                                <li class="card-text" style="margin-left:20px;"><span>Email : </span><b>{{ interviewer.email }}</b></li>
+            {% if interviewer_details|length < 1 %}
+                <div class="alert alert-danger">
+                    There are no Interviewers.
+                </div>
+            {% else %}
+                {% for interviewer in interviewer_details %}
+                <div class="card" style="margin:10px" id="{{ interviewer.id }}">
+                    <div class="card-body">
+                        <h3 class="card-title"></h3>
+                        <div class="interview-wrapper" style="display: flex; justify-content:space-between;align-items: center;">
+                            <div>
+                                <span>Name : <b>{{ interviewer.name }}</b></span><br>
+                                <div class='card-body'>
+                                    <label>Description : </label>
+                                    <li class="card-text" style="margin-left:20px;"><span>Job Role : </span><b>{{ interviewer.job_role }}</b></li>
+                                    <li class="card-text" style="margin-left:20px;"><span>Experience : </span><b>{{ interviewer.Experience }}</b></li>
+                                    <li class="card-text" style="margin-left:20px;"><span>Type Interviewer : </span><b>{{ interviewer.type_interviewer }}</b></li>
+                                    <li class="card-text" style="margin-left:20px;"><span>Technology : </span><b>{{ interviewer.interviewer_technology }}</b></li>
+                                    <li class="card-text" style="margin-left:20px;"><span>Mobile Number : </span><b>{{ interviewer.interviewer_phone }}</b></li>
+                                    <li class="card-text" style="margin-left:20px;"><span>Email : </span><b>{{ interviewer.email }}</b></li>
+                                </div>
                             </div>
-                        </div>
-                        <div>
-                            <button type="button" data-interviewer_id="{{ interviewer.id }}" class="btn btn-outline-danger remove_interviewer">Remove Interviewer</button>
+                            <div>
+                                <button type="button" data-interviewer_id="{{ interviewer.id }}" class="btn btn-outline-danger remove_interviewer">Remove Interviewer</button>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            {% endfor %}
+                {% endfor %}
+            {% endif %}
         </div>
     </div>
 </div>

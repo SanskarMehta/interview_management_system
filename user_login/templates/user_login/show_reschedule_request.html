@@ -1,5 +1,5 @@
 {% extends 'user_login/company_base.html' %}
-{% block title %}{% endblock title %}
+{% block title %}Requests for Reschedule{% endblock title %}
 {% block content %}
 <div class="container">
     <div class="row">
@@ -12,7 +12,7 @@
                     </div>
                     <div class="card-body">
                         <p>Reason : {{ reschedule.reason }}</p>
-                        <a href="{% url 'reschedule-interview' reschedule.interview_application_id %}" class="btn btn-outline-info">Reschedule Interview</a>
+                        <a href="{% url 'reschedule-interview' reschedule.id %}" class="btn btn-outline-info">Reschedule Interview</a>
                     </div>
                 </div>
             {% endfor %}
