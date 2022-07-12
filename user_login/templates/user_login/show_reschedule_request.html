@@ -5,17 +5,21 @@
     <div class="row">
         <div class="col-md-12" style="margin:10px;">
             <h3>Requests for Reschedule</h3>
-            {% for reschedule in reschedule_requests %}
-                <div class="card">
-                    <div class="card-header">
-                        <span>Application ID : </span><a href="{% url 'detail-interview-show' reschedule.interview_application_id %}">{{ reschedule.interview_application_id }}</a>
+            {% if reschedule_requests|length < 1%}
+                <div class="alert alert-warning">There are no requests for <b>Rescheduling.</b></div>
+            {% else %}
+                {% for reschedule in reschedule_requests %}
+                    <div class="card">
+                        <div class="card-header">
+                            <span>Application ID : </span><a href="{% url 'detail-interview-show' reschedule.interview_application_id %}">{{ reschedule.interview_application_id }}</a>
+                        </div>
+                        <div class="card-body">
+                            <p>Reason : {{ reschedule.reason }}</p>
+                            <a href="{% url 'reschedule-interview' reschedule.id %}" class="btn btn-outline-info">Reschedule Interview</a>
+                        </div>
                     </div>
-                    <div class="card-body">
-                        <p>Reason : {{ reschedule.reason }}</p>
-                        <a href="{% url 'reschedule-interview' reschedule.id %}" class="btn btn-outline-info">Reschedule Interview</a>
-                    </div>
-                </div>
-            {% endfor %}
+                {% endfor %}
+            {% endif %}
         </div>
     </div>
 </div>

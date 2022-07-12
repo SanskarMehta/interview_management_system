@@ -9,6 +9,9 @@
                 <h3>Schedule Interviews</h3>
             </div>
             <div>
+            {% if applicants|length < 1 %}
+                <div class="alert alert-danger">Still There are not accepted applications for scheduling Interview.</div>
+            {% else %}
                 {% for applicant in applicants %}
                 <div class="card">
                   <div class="card-header">Application ID : {{ applicant.id }}</div>
@@ -24,6 +27,7 @@
                   </div>
                 </div>
                 {% endfor %}
+            {% endif %}
             </div>
         </div>
         <div class="col-md-2"></div>
