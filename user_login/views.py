@@ -3,7 +3,6 @@ from datetime import datetime
 import json
 from django.contrib import messages
 from django.contrib.auth import login, authenticate, logout
-from django.contrib.auth.decorators import permission_required
 from django.core.mail import send_mail
 from django.db.models import Q
 from django.http import JsonResponse
@@ -12,9 +11,7 @@ from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_exempt
-from django.views.generic import UpdateView, TemplateView
-from rest_framework.decorators import permission_classes
-from rest_framework.permissions import IsAdminUser
+
 
 from user_login.custommixin import UserLoginRequiredMixin, InterviewerLoginRequiredMixin, CompanyLoginRequiredMixin
 from user_login.forms import UpdateUserDetailForm, UpdateInterviewerDetailForm, UserEmailUpdateForm, UpdateJobOpenings, \
@@ -22,7 +19,6 @@ from user_login.forms import UpdateUserDetailForm, UpdateInterviewerDetailForm, 
 from user_login.models import CustomUser, CompanyAcceptance, UserDetails, InterviewerCompany, JobOpenings, \
     InterviewerType, InterviewerDetails, UserJobApplied, UserInterview, Interview, Notification, InterviewerFeedback, \
     RescheduleRequests, UserFeedback
-from django.contrib.auth.mixins import LoginRequiredMixin
 
 
 class HomeView(View):
@@ -115,17 +111,17 @@ class UserRegister(View):
 
 class InterviewerHome(InterviewerLoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
-        return render(request, 'user_login/interviewer_home.html')
+        return render(request, 'user_login/interviewer_home.html',{'interviewer':request.user})
 
 
 class UserHome(UserLoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
-        return render(request, 'user_login/user_home.html')
+        return render(request, 'user_login/user_home.html',{'user':request.user})
 
 
 class CompanyHome(CompanyLoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
-        return render(request, 'user_login/company_home.html')
+        return render(request, 'user_login/company_home.html',{'company':request.user})
 
 
 class CompanyRegister(View):
