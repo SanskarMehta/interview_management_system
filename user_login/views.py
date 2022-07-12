@@ -889,7 +889,7 @@ class RescheduleUserInterview(CompanyLoginRequiredMixin, View):
 
 
 @method_decorator(csrf_exempt, name='dispatch')
-class RescheduleGetTimeSlot(View):
+class RescheduleGetTimeSlot(CompanyLoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         time_slots = ['09:00–09:30', '10:00–10:30', '11:00–11:30', '12:00–12:30', '13:00–13:30',
                       '14:00–14:30', '15:00–15:30', '16:00–16:30', '17:00–17:30']
@@ -910,21 +910,21 @@ class RescheduleGetTimeSlot(View):
         return JsonResponse({'final_time_slot': final_time_slot})
 
 
-class IsAcceptAsEmployee(View):
+class IsAcceptAsEmployee(CompanyLoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         applicants = UserInterview.objects.filter(job_application__job__company=request.user, HR_round='Accepted',
                                                   technical_round='Accepted', selection_status='Pending')
         return render(request, 'user_login/show_all_applicants.html', {'applicants': applicants})
 
 
-class ScheduledUsersInterviewsDisplay(View):
+class ScheduledUsersInterviewsDisplay(CompanyLoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         interviews = Interview.objects.filter(application__job_application__job__company=request.user)
         return render(request, 'user_login/Show_scheduled_interviews.html', {'interviews': interviews})
 
 
 @method_decorator(csrf_exempt, name='dispatch')
-class CollectFinalStatus(View):
+class CollectFinalStatus(CompanyLoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         request_data = request.read()
         form_data = json.loads(request_data.decode('utf-8'))
@@ -946,3 +946,9 @@ class CollectFinalStatus(View):
         message.save()
         send_mail('Employment Status', notification_message, request.user.email, [user.job_application.user.email])
         return JsonResponse({'message': messages})
+
+
+class ShowFeedBackInterviewer(InterviewerLoginRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        interviewer_feedbacks = InterviewerFeedback.objects.filter(interviewer=request.user)
+        return render(request,'user_login/interviewer_feedbacks.html',{'interviewer_feedbacks':interviewer_feedbacks})

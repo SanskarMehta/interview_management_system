@@ -8,7 +8,7 @@ from user_login.views import UserLogin, UserRegister, InterviewerHome, UserHome,
     ShowDetailSchedule, DetailsInterviewer, UserMessage, CompanyMessage, InterviewerMessage, UserFeedbackView, \
     RescheduleRequest, ShowRescheduleRequests, FeedbackOfInterviewer, PostInterviewProcess, DeactivateAccount, \
     ReactivateAccount, ReactivationUser, DetailInterviewScheduleShow, RescheduleUserInterview, RescheduleGetTimeSlot, \
-    IsAcceptAsEmployee, ScheduledUsersInterviewsDisplay, CollectFinalStatus
+    IsAcceptAsEmployee, ScheduledUsersInterviewsDisplay, CollectFinalStatus, ShowFeedBackInterviewer
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth import views as auth_view
@@ -86,6 +86,7 @@ urlpatterns = [
     path('accept_reject_applicant/', IsAcceptAsEmployee.as_view(), name='accept-reject-applicant'),
     path('show_scheduled_interviews/', ScheduledUsersInterviewsDisplay.as_view(), name='show-scheduled-interviews'),
     path('collect_final_status/', CollectFinalStatus.as_view(), name='collect-final-status'),
+    path('show_feedback_interviewer/',ShowFeedBackInterviewer.as_view(),name='feedback-of-interviewer'),
 ]
 
 if settings.DEBUG:
