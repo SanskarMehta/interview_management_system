@@ -84,7 +84,7 @@ class UserLogin(View):
                 messages.info(request, "Your account is blocked by admin. Please call on number : 129121####.")
                 return redirect('login')
         else:
-            messages.info(request, 'You unable to register because credentials are not matching')
+            messages.info(request, 'You unable to login because credentials are not matching')
             return render(request, 'user_login/login.html')
 
 
@@ -150,10 +150,12 @@ class CompanyRegister(View):
                 user.save()
                 company_acceptance = CompanyAcceptance(company=user)
                 company_acceptance.save()
-                notification_message = username + "is a new company and it has registered in our portal.It wants to use our services."
-                admin_notification = Notification.objects.create(sender=user, receiver='admin',
-                                                                 message=notification_message)
-                admin_notification.save()
+                notification_message = username + "is a new company and it has registered in our portal.It wants to " \
+
+                admins = CustomUser.objects.filter(is_superuser=True)
+                for admin in admins:
+                    admin_notification = Notification.objects.create(sender=user, receiver=admin, message=notification_message)
+                    admin_notification.save()
                 return redirect('login')
         else:
             return render(request, 'user_login/company_register.html')
