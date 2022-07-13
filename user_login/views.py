@@ -12,7 +12,6 @@ from django.views import View
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_exempt
 
-
 from user_login.custommixin import UserLoginRequiredMixin, InterviewerLoginRequiredMixin, CompanyLoginRequiredMixin
 from user_login.forms import UpdateUserDetailForm, UpdateInterviewerDetailForm, UserEmailUpdateForm, UpdateJobOpenings, \
     ScheduleInterviews, UserFeedbackByInterviewer, RescheduleTime
@@ -111,17 +110,17 @@ class UserRegister(View):
 
 class InterviewerHome(InterviewerLoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
-        return render(request, 'user_login/interviewer_home.html',{'interviewer':request.user})
+        return render(request, 'user_login/interviewer_home.html', {'interviewer': request.user})
 
 
 class UserHome(UserLoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
-        return render(request, 'user_login/user_home.html',{'user':request.user})
+        return render(request, 'user_login/user_home.html', {'user': request.user})
 
 
 class CompanyHome(CompanyLoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
-        return render(request, 'user_login/company_home.html',{'company':request.user})
+        return render(request, 'user_login/company_home.html', {'company': request.user})
 
 
 class CompanyRegister(View):
@@ -146,11 +145,12 @@ class CompanyRegister(View):
                 user.save()
                 company_acceptance = CompanyAcceptance(company=user)
                 company_acceptance.save()
-                notification_message = username + "is a new company and it has registered in our portal.It wants to " \
+                notification_message = username + "is a new company and it has registered in our portal.It wants to "
 
                 admins = CustomUser.objects.filter(is_superuser=True)
                 for admin in admins:
-                    admin_notification = Notification.objects.create(sender=user, receiver=admin, message=notification_message)
+                    admin_notification = Notification.objects.create(sender=user, receiver=admin,
+                                                                     message=notification_message)
                     admin_notification.save()
                 return redirect('login')
         else:
@@ -236,7 +236,7 @@ class CompanyAddInterviewer(CompanyLoginRequiredMixin, View):
                 interviewer_company.save()
                 email_message = 'Hiii \n I am sending your credentials of portal login and after login please fill your details and if you want then please change your password also.\nThank You.\n ID: ' + email + " Password: " + password + "."
                 send_mail('Interviewer Credentials', email_message, request.user.email, [email],
-                              fail_silently=False, )
+                          fail_silently=False, )
                 return redirect('show-interviewers')
         else:
             messages.info(request, "Your password's are not matching so you unable to create account.")
@@ -575,7 +575,8 @@ class JobOpeningUpdate(CompanyLoginRequiredMixin, View):
 
 class ShowAcceptedInterviewers(CompanyLoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
-        applicants = UserInterview.objects.filter(job_application__job__company=request.user)
+        applicants = UserInterview.objects.filter(Q(technical_round='Pending') | Q(HR_round='Pending'),
+                                                  job_application__job__company=request.user)
         return render(request, 'user_login/schedule_interviews.html', {'applicants': applicants})
 
 
@@ -624,7 +625,7 @@ class ScheduleApplicantInterview(CompanyLoginRequiredMixin, View):
         user_email = application.job_application.user.email
         interviewer_email = interviewer.interviewer.email
         send_mail(email_subject, email_message, request.user.email, [user_email, interviewer_email],
-                      fail_silently=False, )
+                  fail_silently=False, )
         return redirect('show-accepted-applicants')
 
 
@@ -947,4 +948,5 @@ class CollectFinalStatus(CompanyLoginRequiredMixin, View):
 class ShowFeedBackInterviewer(InterviewerLoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         interviewer_feedbacks = InterviewerFeedback.objects.filter(interviewer=request.user)
-        return render(request,'user_login/interviewer_feedbacks.html',{'interviewer_feedbacks':interviewer_feedbacks})
+        return render(request, 'user_login/interviewer_feedbacks.html',
+                      {'interviewer_feedbacks': interviewer_feedbacks})
