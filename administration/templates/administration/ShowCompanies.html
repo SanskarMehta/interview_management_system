@@ -13,26 +13,32 @@
         <th>Action</th>
       </tr>
     </thead>
-    {% for company in companies %}
-    <tbody>
-      <tr>
-        <td>{{ company.company.id }}</td>
-        <td>{{ company.company.username }}</td>
-        <td>{{ company.company.email }}</td>
-        <td class="action_button_{{ company.company.id }}">
-             {% if company.company.is_block == False  %}
-                <div class="block_status_{{ company.company.id }}">
-                  <span style="margin-right:30px;">Would you like to Block ?</span><button type="button" data-user_id="{{ company.company.id }}" data-status="1" class="btn btn-outline-danger block_status">Block</button>
-                </div>
-             {% else %}
-                <div class="unblock_status_{{ company.company.id }}">
-                  <span style="margin-right:30px;">Would you like to Unblock ?</span><button type="button" data-user_id="{{ company.company.id }}" data-status="0" class="btn btn-outline-info block_status">Unblock</button>
-                </div>
-             {% endif %}
-        </td>
-      </tr>
-    </tbody>
-    {% endfor %}
+    {% if companies|length < 1 %}
+        <div class="alert alert-danger" style="margin:10px;">
+            You don't have any registered Companies.
+        </div>
+    {% else %}
+        {% for company in companies %}
+        <tbody>
+          <tr>
+            <td>{{ company.company.id }}</td>
+            <td>{{ company.company.username }}</td>
+            <td>{{ company.company.email }}</td>
+            <td class="action_button_{{ company.company.id }}">
+                 {% if company.company.is_block == False  %}
+                    <div class="block_status_{{ company.company.id }}">
+                      <span style="margin-right:30px;">Would you like to Block ?</span><button type="button" data-user_id="{{ company.company.id }}" data-status="1" class="btn btn-outline-danger block_status">Block</button>
+                    </div>
+                 {% else %}
+                    <div class="unblock_status_{{ company.company.id }}">
+                      <span style="margin-right:30px;">Would you like to Unblock ?</span><button type="button" data-user_id="{{ company.company.id }}" data-status="0" class="btn btn-outline-info block_status">Unblock</button>
+                    </div>
+                 {% endif %}
+            </td>
+          </tr>
+        </tbody>
+        {% endfor %}
+    {% endif %}
   </table>
 </div>
 {% endblock content %}

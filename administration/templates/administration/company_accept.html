@@ -6,22 +6,28 @@
     <div class="row">
         <div class="col-md-2"></div>
         <div class="col-md-8">
-            {% for company in companies %}
-            <div class="card" style="margin:10px;">
-                <div class="card-header"><span>ID : </span><span>{{ company.company.id }}</span></div>
-                <div class="card-body">
-                    <p>Name : <span>{{ company.company.username }}</span></p>
-                    <p>Email : <span>{{ company.company.email }}</span></p>
-                    <div class="acceptance_status_{{ company.id }}">
-                        <button type="button" data-company_id="{{ company.id }}" data-status="0" class="btn btn-outline-success cv_status accept_status_{{ company.id }}">
-                            Accept
-                        </button>
-                        <button type="button" data-company_id="{{ company.id }}" data-status="1" class="btn btn-outline-danger cv_status reject_status_{{ company.id }}">Reject
-                        </button>
+            {% if companies|length < 1 %}
+                <div class="alert alert-danger" style="margin:10px;">
+                    You don't have any requests from Company for Acceptance.
+                </div>
+            {% else %}
+                {% for company in companies %}
+                <div class="card" style="margin:10px;">
+                    <div class="card-header"><span>ID : </span><span>{{ company.company.id }}</span></div>
+                    <div class="card-body">
+                        <p>Name : <span>{{ company.company.username }}</span></p>
+                        <p>Email : <span>{{ company.company.email }}</span></p>
+                        <div class="acceptance_status_{{ company.id }}">
+                            <button type="button" data-company_id="{{ company.id }}" data-status="0" class="btn btn-outline-success cv_status accept_status_{{ company.id }}">
+                                Accept
+                            </button>
+                            <button type="button" data-company_id="{{ company.id }}" data-status="1" class="btn btn-outline-danger cv_status reject_status_{{ company.id }}">Reject
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
-            {% endfor %}
+                {% endfor %}
+            {% endif %}
         </div>
         <div class="col-md-2"></div>
     </div>

@@ -3,6 +3,7 @@ import json
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
@@ -98,8 +99,11 @@ class DetailsOfUser(AdminLoginRequiredMixin, View):
     """
 
     def get(self, request, *args, **kwargs):
-        user_details = UserDetails.objects.get(user_id=kwargs['pk'])
-        return render(request, 'administration/DetailsUser.html', {'user_detail': user_details})
+        try:
+            user_details = UserDetails.objects.get(user_id=kwargs['pk'])
+            return render(request, 'administration/DetailsUser.html', {'user_detail': user_details})
+        except ObjectDoesNotExist:
+            return render(request,'administration/errors/403.html')
 
 
 class DetailsOfInterviewer(AdminLoginRequiredMixin, View):
@@ -112,10 +116,13 @@ class DetailsOfInterviewer(AdminLoginRequiredMixin, View):
     """
 
     def get(self, request, *args, **kwargs):
-        interviewer_details = InterviewerDetails.objects.get(id=kwargs['pk'])
-        company_name = InterviewerCompany.objects.get(interviewer=interviewer_details.interviewer)
-        return render(request, 'administration/DetailsInterviewer.html',
-                      {'interviewer_detail': interviewer_details, 'company': company_name.company.username})
+        try :
+            interviewer_details = InterviewerDetails.objects.get(id=kwargs['pk'])
+            company_name = InterviewerCompany.objects.get(interviewer=interviewer_details.interviewer)
+            return render(request, 'administration/DetailsInterviewer.html',
+                          {'interviewer_detail': interviewer_details, 'company': company_name.company.username})
+        except ObjectDoesNotExist:
+            return render(request,'administration/errors/403.html')
 
 
 class CompanyRegisterByAdmin(AdminLoginRequiredMixin, View):
@@ -209,24 +216,31 @@ class AdminUpdateUserDetails(AdminLoginRequiredMixin, View):
     """
 
     def get(self, request, *args, **kwargs):
-        form = UpdateUserDetailForm(instance=request.user.userdetails)
-        form2 = UserEmailUpdateForm(instance=request.user)
-        return render(request, 'administration/admin_update_profile.html', {'form': form, 'form2': form2})
+        try:
+            form = UpdateUserDetailForm(instance=request.user.userdetails)
+            form2 = UserEmailUpdateForm(instance=request.user)
+            return render(request, 'administration/admin_update_profile.html', {'form': form, 'form2': form2})
+        except ObjectDoesNotExist:
+            return render(request,'administration/errors/403.html')
+
 
     def post(self, request, *args, **kwargs):
-        form = UpdateUserDetailForm(request.POST, instance=request.user.userdetails)
-        form2 = UserEmailUpdateForm(request.POST, instance=request.user)
-        if form.is_valid():
-            form.save()
-            if form2.is_valid():
-                form2.save()
-                # messages.success(request,'Succefully Updated the Values and Email')
-                return redirect('admin-user-details', pk=request.user.id)
+        try:
+            form = UpdateUserDetailForm(request.POST, instance=request.user.userdetails)
+            form2 = UserEmailUpdateForm(request.POST, instance=request.user)
+            if form.is_valid():
+                form.save()
+                if form2.is_valid():
+                    form2.save()
+                    # messages.success(request,'Succefully Updated the Values and Email')
+                    return redirect('admin-user-details', pk=request.user.id)
+                else:
+                    # messages.success(request,'Succefully Updated the Values')
+                    return redirect('user-profile')
             else:
-                # messages.success(request,'Succefully Updated the Values')
-                return redirect('user-profile')
-        else:
-            return redirect('admin-update-profile')
+                return redirect('admin-update-profile')
+        except ObjectDoesNotExist:
+            return render(request,'administration/errors/403.html')
 
 
 @method_decorator(csrf_exempt, name='dispatch')

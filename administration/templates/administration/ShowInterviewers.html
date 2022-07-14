@@ -11,15 +11,21 @@
         <th>Email</th>
       </tr>
     </thead>
-    {% for interviewer in interviewers %}
-    <tbody>
-      <tr>
-        <td><a href="{% url 'admin-interviewer-details' interviewer.id %}">{{ interviewer.id }}</a></td>
-        <td>{{ interviewer.interviewer.username }}</td>
-        <td>{{ interviewer.interviewer.email }}</td>
-      </tr>
-    </tbody>
-    {% endfor %}
+    {% if interviewers|length < 1 %}
+        <div class="alert alert-danger" style="margin:10px;">
+            You don't have any interviewers registered on portal.
+        </div>
+    {% else %}
+      {% for interviewer in interviewers %}
+        <tbody>
+          <tr>
+            <td><a href="{% url 'admin-interviewer-details' interviewer.id %}">{{ interviewer.id }}</a></td>
+            <td>{{ interviewer.interviewer.username }}</td>
+            <td>{{ interviewer.interviewer.email }}</td>
+          </tr>
+        </tbody>
+      {% endfor %}
+    {% endif %}
   </table>
 </div>
 {% endblock content %}
