@@ -10,38 +10,44 @@
         </div>
         <div class="col-md-12">
             <div>
-                {% for job in jobs %}
-                <div style="margin:10px">
-                    <div class="card border-dark">
-                      <div class="card-body">
-                        <h3 class="card-title">
-                            {{ job.job.job_role }}
-                        </h3>
-                        <div>
-                            <span class='alert alert-info' role="alert" style="padding:5px;  border-radius:5px;"><small><b>{{ job.job.company.username }}</b></small></span>
-                            <span class='alert alert-info' role="alert" style="padding:5px;  border-radius:5px;"><small><b>{{ job.job.job_location }}</b></small></span>
-                            <div class='card-body'>
-                                <span class="job_description">Description : </span><li class="card-text" style="margin-left:20px;">{{ job.job.description}}</li>
-                            </div>
-                        </div>
-                        {% if job.application_status == 'Pending' %}
-                        <div>
-                            <span class='alert alert-warning' role="alert" style="padding:5px; padding-left:10px; padding-right:10px; border-radius:5px;"><small><b>{{ job.application_status }}</b></small></span>
-                        </div>
-                        {% elif job.application_status == 'Rejected' %}
-                        <div>
-                            <span class='alert alert-danger' role="alert" style="padding:5px; padding-left:10px; padding-right:10px; border-radius:5px;"><small><b>{{ job.application_status }}</b></small></span>
-                        </div>
-                        {% else %}
-                        <div>
-                            <span class='alert alert-success' role="alert" style="padding:5px; padding-left:10px; padding-right:10px; border-radius:5px;"><small><b>{{ job.application_status }}</b></small></span>
-                            <span><a href="{% url 'detail-schedule' job.id %}" class="btn btn-outline-primary btn-sm" style="margin-bottom:2px;">Show Schedule</a></span>
-                        </div>
-                        {% endif %}
-                      </div>
+                {% if jobs|length < 1%}
+                    <div class="alert alert-warning">
+                        You haven't applied in any company still.
                     </div>
-                </div>
-                {% endfor %}
+                {% else %}
+                    {% for job in jobs %}
+                    <div style="margin:10px">
+                        <div class="card border-dark">
+                          <div class="card-body">
+                            <h3 class="card-title">
+                                {{ job.job.job_role }}
+                            </h3>
+                            <div>
+                                <span class='alert alert-info' role="alert" style="padding:5px;  border-radius:5px;"><small><b>{{ job.job.company.username }}</b></small></span>
+                                <span class='alert alert-info' role="alert" style="padding:5px;  border-radius:5px;"><small><b>{{ job.job.job_location }}</b></small></span>
+                                <div class='card-body'>
+                                    <span class="job_description">Description : </span><li class="card-text" style="margin-left:20px;">{{ job.job.description}}</li>
+                                </div>
+                            </div>
+                            {% if job.application_status == 'Pending' %}
+                            <div>
+                                <span class='alert alert-warning' role="alert" style="padding:5px; padding-left:10px; padding-right:10px; border-radius:5px;"><small><b>{{ job.application_status }}</b></small></span>
+                            </div>
+                            {% elif job.application_status == 'Rejected' %}
+                            <div>
+                                <span class='alert alert-danger' role="alert" style="padding:5px; padding-left:10px; padding-right:10px; border-radius:5px;"><small><b>{{ job.application_status }}</b></small></span>
+                            </div>
+                            {% else %}
+                            <div>
+                                <span class='alert alert-success' role="alert" style="padding:5px; padding-left:10px; padding-right:10px; border-radius:5px;"><small><b>{{ job.application_status }}</b></small></span>
+                                <span><a href="{% url 'detail-schedule' job.id %}" class="btn btn-outline-primary btn-sm" style="margin-bottom:2px;">Show Schedule</a></span>
+                            </div>
+                            {% endif %}
+                          </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% endif %}
             </div>
         </div>
     </div>

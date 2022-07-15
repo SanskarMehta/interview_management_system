@@ -8,25 +8,29 @@
         </div>
         <div class="col-md-4"></div>
         <div class="col-md-8">
-            {% for interview in interviews %}
-            <div class="card" style="margin:10px;">
-                <div class="card-header">
-                    <h5>Application ID: {{ interview.application_id }}</h5>
+            {% if interviews|length < 1 %}
+                <div class="alert alert-warning">There are no applications for Post Interview Process.</div>
+            {% else %}
+                {% for interview in interviews %}
+                <div class="card" style="margin:10px;">
+                    <div class="card-header">
+                        <h5>Application ID: {{ interview.application_id }}</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>Name : {{ interview.application.job_application.user }}</p>
+                        <hr>
+                        <p>Job Role : {{ interview.application.job_application.job.job_role }}</p>
+                        <hr>
+                        <p>Description : {{ interview.application.job_application.job.description }}</p>
+                        <hr>
+                        <p>Job Location : {{ interview.application.job_application.job.job_location }}</p>
+                        <hr>
+                        <p></p>
+                        <a href="{% url 'post-interview' interview.application_id %}" class="btn btn-outline-info">Evaluation</a>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <p>Name : {{ interview.application.job_application.user }}</p>
-                    <hr>
-                    <p>Job Role : {{ interview.application.job_application.job.job_role }}</p>
-                    <hr>
-                    <p>Description : {{ interview.application.job_application.job.description }}</p>
-                    <hr>
-                    <p>Job Location : {{ interview.application.job_application.job.job_location }}</p>
-                    <hr>
-                    <p></p>
-                    <a href="{% url 'post-interview' interview.application_id %}" class="btn btn-outline-info">Evaluation</a>
-                </div>
-            </div>
-            {% endfor %}
+                {% endfor %}
+            {% endif %}
         </div>
     </div>
 </div>

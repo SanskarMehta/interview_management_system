@@ -4,24 +4,30 @@
 {% block content %}
 <div class="container">
     <h3>Welcome to Job-List Page</h3>
-    {% for job in job_lists %}
-    <div style="margin:10px">
-        <div class="card border-dark">
-          <div class="card-body">
-            <h3 class="card-title">
-                {{ job.job_role }}
-            </h3>
-            <div>
-                <span class='alert alert-info' style=" padding:5px;  border-radius:5px;"><small><b>{{ job.company.username }}</b></small></span>
-                <span class='alert alert-info' style=" rgba(0,0,0,0.3); padding:5px;  border-radius:5px;"><small><b>{{ job.job_location }}</b></small></span>
-                <div class='card-body'>
-                    <span class="job_description">Description : </span><li class="card-text" style="margin-left:20px;">{{ job.description}}</li>
+    {% if job_lists|length < 1 %}
+        <div class="alert alert-warning">
+            There are no Jobs posted from any company.
+        </div>
+    {% else %}
+        {% for job in job_lists %}
+        <div style="margin:10px">
+            <div class="card border-dark">
+              <div class="card-body">
+                <h3 class="card-title">
+                    {{ job.job_role }}
+                </h3>
+                <div>
+                    <span class='alert alert-info' style=" padding:5px;  border-radius:5px;"><small><b>{{ job.company.username }}</b></small></span>
+                    <span class='alert alert-info' style=" rgba(0,0,0,0.3); padding:5px;  border-radius:5px;"><small><b>{{ job.job_location }}</b></small></span>
+                    <div class='card-body'>
+                        <span class="job_description">Description : </span><li class="card-text" style="margin-left:20px;">{{ job.description}}</li>
+                    </div>
                 </div>
-            </div>
-            <a href="{% url 'job-apply' job.id %}" class="btn btn-primary" style="padding-right: 30px; padding-left: 30px;">Apply</a>
+                <a href="{% url 'job-apply' job.id %}" class="btn btn-primary" style="padding-right: 30px; padding-left: 30px;">Apply</a>
+              </div>
           </div>
-      </div>
-    </div>
-    {% endfor %}
+        </div>
+        {% endfor %}
+    {% endif %}
 </div>
 {% endblock content %}

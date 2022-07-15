@@ -21,12 +21,21 @@ from user_login.models import CustomUser, CompanyAcceptance, UserDetails, Interv
 
 
 class HomeView(View):
+    """
+    This view is used for representing the welcome page of Interview Management System.
+    This is the first page with which user interacts first.
+    """
     def get(self, request, *args, **kwargs):
         return render(request, 'user_login/base.html')
 
 
 @method_decorator(never_cache, name='dispatch')
 class UserLogin(View):
+    """
+    This is used for login by the different type of users
+    username -> str : It is a variable which is used to get the username from the html
+    password -> str : It is a variable which is used to get the password from the html
+    """
     def get(self, request, *args, **kwargs):
         if request.user.is_authenticated:
             if request.user.is_interviewer:
@@ -84,6 +93,13 @@ class UserLogin(View):
 
 
 class UserRegister(View):
+    """
+    This view is used to register a new user to Interview Management System.
+    username -> str : It holds the username which is retrieved from the html side.
+    email -> str : It holds the email which is retrieved from the html side.
+    password -> str : It holds the password which is retrieved from the html side.
+    password2 -> str : It holds the confirm-password which is retrieved from the html side.
+    """
     def get(self, request, *args, **kwargs):
         return render(request, 'user_login/register.html')
 
@@ -124,6 +140,16 @@ class CompanyHome(CompanyLoginRequiredMixin, View):
 
 
 class CompanyRegister(View):
+    """
+    This view is used to register a new company.
+    username -> str : It holds the username which is retrieved from the html side.
+    email -> str : It holds the email which is retrieved from the html side.
+    password -> str : It holds the password which is retrieved from the html side.
+    password2 -> str : It holds the confirm-password which is retrieved from the html side.
+    user -> object : It is an object which is created to save data in CustomUser Model
+    company_acceptance -> object : It is an object which creates an entry in CompanyAcceptance table which is used by
+                                   Admin to approve the company
+    """
     def get(self, request, *args, **kwargs):
         return render(request, 'user_login/company_register.html')
 
@@ -158,6 +184,15 @@ class CompanyRegister(View):
 
 
 class UserDetailsForm(UserLoginRequiredMixin, View):
+    """
+    This is the view which is used to take data of user when he login for the very first time.
+    user_phone -> str : It holds the data of mobile number which is entered on HTML by user
+    user_technology -> str : It holds the data of technology which is entered on HTML by user
+    user_10th_marks -> float : It holds the marks of 10th standard which is entered on HTML by user
+    user_12th_marks -> float : It holds the marks of 12th standard which is entered on HTML by user
+    user_CPI -> float : It holds the CPi of college which is entered on HTML by user
+    user_CV -> FormField : It holds the CV of user which is uploaded by the user.
+    """
     def get(self, request, *args, **kwargs):
         return render(request, 'user_login/user_details_form.html')
 
@@ -190,6 +225,15 @@ class UserDetailsForm(UserLoginRequiredMixin, View):
 
 
 class CompanyJobOpenings(CompanyLoginRequiredMixin, View):
+    """
+    This view is used by the company to create a new job opening in their company.
+    job_location -> str : It holds the data of Location of Job which is submitted in the HTML.
+    job_role -> str : It holds the role of Job which is submitted in the HTML.
+    description -> str : It consists the description related to Job
+    job_open -> object : It is an object which stores the all the data related to JobOpenings model.
+    messages -> str : It is a variable which holds the data related to send notification to users.
+    company -> str : It is a variable which holds the name of the current logged in company.
+    """
     def get(self, request, *args, **kwargs):
         company = request.user.username
         return render(request, 'user_login/company_job_opening.html', {'company': company})
@@ -211,6 +255,17 @@ class CompanyJobOpenings(CompanyLoginRequiredMixin, View):
 
 
 class CompanyAddInterviewer(CompanyLoginRequiredMixin, View):
+    """
+    This view is used to add new Interviewer in the company.
+    company -> str : It is a variable which holds the name of the current logged in company.
+    username -> str : It holds the username which is retrieved from the html side.
+    email -> str : It holds the email which is retrieved from the html side.
+    password -> str : It holds the password which is retrieved from the html side.
+    password2 -> str : It holds the confirm-password which is retrieved from the html side.
+    interviewer -> object : It holds the value of interviewer and save the data in CustomUser model.
+    email_message -> str : It holds the credentials of interviewer and used in send_email() to share with particular
+                           user for login.
+    """
     def get(self, request, *args, **kwargs):
         company = request.user.username
         return render(request, 'user_login/company_add_interviewer.html', {'company': company})
@@ -246,6 +301,16 @@ class CompanyAddInterviewer(CompanyLoginRequiredMixin, View):
 
 
 class InterviewerDetailsForm(InterviewerLoginRequiredMixin, View):
+    """
+    This view is used for collecting information of Interviewer , when they log in for very first time.
+    InterviewerTypes -> objects : It is a collection of objects which are used to display a drop-down of
+                        different types of Interviewer.
+    phone_number -> str : It is a variable which holds the phone number which is retrieved from HTML.
+    technology -> str : It is a variable which holds the technology which is retrieved from HTML.
+    job_role -> str : It is a variable which holds the job_role which is retrieved from HTML.
+    experience -> str : It is a variable which holds the experience which is retrieved from HTML.
+    type_of_interviewer -> object :  It is an object which holds the interview type,which is retrieved from HTML.
+    """
     def get(self, request, *args, **kwargs):
         InterviewerTypes = InterviewerType.objects.all()
         list1 = []
@@ -276,12 +341,25 @@ class InterviewerDetailsForm(InterviewerLoginRequiredMixin, View):
 
 
 class JobLists(UserLoginRequiredMixin, View):
+    """
+    This is a view which is used to display all the posted jobs of different companies to the users.
+    job_lists -> object : It is a collection of Jobs of JobOpening model.
+    """
     def get(self, request, *args, **kwargs):
         job_lists = JobOpenings.objects.all()
         return render(request, 'user_login/job_lists.html', {'job_lists': job_lists})
 
 
 class JobListsApply(UserLoginRequiredMixin, View):
+    """
+    This is a view which is used to display all the posted jobs of different companies to the users.
+    job_lists -> object : It is a collection of Jobs of JobOpening model.
+    id1 -> int : It is an id of JobOpenings, using which specific Job Post is identified.
+    company -> object : It stores the specific job opening related to object.
+    notification_message -> str : It is a variable which stores the message which is used to send as notification
+                                  to other users.
+    admin_ message -> object : It is used to store notification data in Notification model.
+    """
     def get(self, request, *args, **kwargs):
         job_lists = JobOpenings.objects.all()
         id1 = self.kwargs['pk']
@@ -304,6 +382,13 @@ class JobListsApply(UserLoginRequiredMixin, View):
 
 
 class UserChangePassword(UserLoginRequiredMixin, View):
+    """
+    This view is used to change the password of user.
+    username -> str : It holds the name of the current user
+    new_password -> str : It holds the new password of the user
+    confirm_password -> str : It stores the re-entered new password of the user
+    old_password -> str : It stores the old-password of user , which is used to authenticate.
+    """
     def get(self, request, *args, **kwargs):
         username = request.user.username
         return render(request, 'user_login/user_change_password.html', {'username': username})
@@ -331,6 +416,13 @@ class UserChangePassword(UserLoginRequiredMixin, View):
 
 
 class CompanyChangePassword(CompanyLoginRequiredMixin, View):
+    """
+    This view is used to change the password of company.
+    username -> str : It holds the name of the current logged in company.
+    new_password -> str : It holds the new password of the company.
+    confirm_password -> str : It stores the re-entered new password of the company.
+    old_password -> str : It stores the old-password of company, which is used to authenticate.
+    """
     def get(self, request, *args, **kwargs):
         username = request.user.username
         return render(request, 'user_login/company_change_password.html', {'username': username})
@@ -358,6 +450,13 @@ class CompanyChangePassword(CompanyLoginRequiredMixin, View):
 
 
 class InterviewerChangePassword(InterviewerLoginRequiredMixin, View):
+    """
+    This view is used to change the password of Interviewer.
+    username -> str : It holds the name of the current logged in Interviewer.
+    new_password -> str : It holds the new password of the Interviewer.
+    confirm_password -> str : It stores the re-entered new password of the Interviewer.
+    old_password -> str : It stores the old-password of Interviewer, which is used to authenticate.
+    """
     def get(self, request, *args, **kwargs):
         username = request.user.username
         return render(request, 'user_login/interviewer_change_password.html', {'username': username})
@@ -386,6 +485,12 @@ class InterviewerChangePassword(InterviewerLoginRequiredMixin, View):
 
 
 class CompanyCareer(CompanyLoginRequiredMixin, View):
+    """
+    This view is used to display the job openings of specific logged in company and also used to
+    delete the particular job openings.
+    jobs -> objects : it is a collection of job openings of particular logged in company.
+    job_id -> int : It is a id of particular job which is used to delete particular job.
+    """
     def get(self, request, *args, **kwargs):
         jobs = JobOpenings.objects.filter(company=request.user)
         return render(request, 'user_login/company_career.html', {'jobs': jobs})
@@ -400,18 +505,32 @@ class CompanyCareer(CompanyLoginRequiredMixin, View):
 
 
 class UserAppliedJobs(UserLoginRequiredMixin, View):
+    """
+    This view is used to show the status for users' application in different companies.
+    jobs -> objects : It is a collection of objects which consist the data about particular user in which
+                      different companies' user have applied for various posts.
+    """
     def get(self, request, *args, **kwargs):
         jobs = UserJobApplied.objects.filter(user=request.user)
         return render(request, 'user_login/user_job_applied.html', {'jobs': jobs})
 
 
 class UserProfile(UserLoginRequiredMixin, View):
+    """
+    This view is used to display the particular user's details
+    user_details -> object : It consists the details of user which is rendered on HTML page.
+    """
     def get(self, request, *args, **kwargs):
         user_details = UserDetails.objects.filter(user=request.user)
         return render(request, 'user_login/user_profile.html', {'user_details': user_details})
 
 
 class InterviewerProfile(InterviewerLoginRequiredMixin, View):
+    """
+    This view is used to display the particular Interviewer's details
+    company_name -> object : It stores the name of the company, from which interviewer belongs.
+    interviewer_details -> object : It consists the details of interviewer which is rendered on HTML page.
+    """
     def get(self, request, *args, **kwargs):
         company_name = InterviewerCompany.objects.get(interviewer=request.user)
         interviewer_details = InterviewerDetails.objects.filter(interviewer=request.user)
@@ -421,6 +540,12 @@ class InterviewerProfile(InterviewerLoginRequiredMixin, View):
 
 @method_decorator(csrf_exempt, name='dispatch')
 class ShowInterviewers(CompanyLoginRequiredMixin, View):
+    """
+    This view is used to show all those interviewers to company which belongs to them.
+    Also, interviewers are managed from here.
+    interviewers -> objects : It is a collection of Interviewers of specific company.
+    interviewer_id -> int : It stores the id of interviewer which is used to remove the interviewer.
+    """
     def get(self, request, *args, **kwargs):
         interviewers = InterviewerCompany.objects.select_related("interviewer").filter(company=request.user)
         interviewer_list = []

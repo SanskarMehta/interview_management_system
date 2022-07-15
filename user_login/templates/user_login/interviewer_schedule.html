@@ -19,16 +19,22 @@
                             <th>Time</th>
                         </tr>
                     </thead>
-                    {% for applicant in interview_schedule %}
-                    <tbody>
-                        <tr>
-                            <td><a href="{% url 'applicant_details' applicant.application_id %}">{{ applicant.application_id }}</a></td>
-                            <td>{{ applicant.application.job_application.user.username }}</td>
-                            <td>{{ applicant.interview_date }}</td>
-                            <td>{{ applicant.interview_time }}</td>
-                        </tr>
-                    </tbody>
-                    {% endfor %}
+                    {% if interview_schedule|length < 1%}
+                        <div class="alert alert-warning">
+                            There are no scheduled Interview for you.
+                        </div>
+                    {% else %}
+`                        {% for applicant in interview_schedule %}
+                        <tbody>
+                            <tr>
+                                <td><a href="{% url 'applicant_details' applicant.application_id %}">{{ applicant.application_id }}</a></td>
+                                <td>{{ applicant.application.job_application.user.username }}</td>
+                                <td>{{ applicant.interview_date }}</td>
+                                <td>{{ applicant.interview_time }}</td>
+                            </tr>
+                        </tbody>
+                        {% endfor %}`
+                    {% endif %}
                 </table>
             </div>
         </div>
