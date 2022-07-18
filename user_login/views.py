@@ -579,6 +579,11 @@ class ShowInterviewers(CompanyLoginRequiredMixin, View):
 
 
 class UpdateUserDetails(UserLoginRequiredMixin, View):
+    """
+    This view is used to update the details of User.
+    form -> form : It is used to update the details of UsedDetails Model (For logged in user).
+    form2 -> form : It is used to update the email of CustomUser Model (For logged-in user).
+    """
     def get(self, request, *args, **kwargs):
         form = UpdateUserDetailForm(instance=request.user.userdetails)
         form2 = UserEmailUpdateForm(instance=request.user)
@@ -599,6 +604,11 @@ class UpdateUserDetails(UserLoginRequiredMixin, View):
 
 
 class UpdateInterviewerDetails(InterviewerLoginRequiredMixin, View):
+    """
+    This view is used to update the details of User.
+    form1 -> form : It is used to update the details of InterviewerDetails Model (For logged-in user).
+    form2 -> form : It is used to update the email of CustomUser Model (For logged-in user).
+    """
     def get(self, request, *args, **kwargs):
         form1 = UpdateInterviewerDetailForm(instance=request.user.interviewerdetails)
         form2 = UserEmailUpdateForm(instance=request.user)
@@ -619,6 +629,13 @@ class UpdateInterviewerDetails(InterviewerLoginRequiredMixin, View):
 
 
 class ShowAppliedUser(CompanyLoginRequiredMixin, View):
+    """
+    This view is used to display the applicants who have applied for jobs in loggd-in company.
+    applicants -> objects : It is a collection of object of UserJobApplied model.
+    applicant_details -> list : It is a list of dictionaries which consist the data of users who have applied for job in
+                                logged-in company.
+    notification_message -> str : It is a variable which stores the notification message.
+    """
     def get(self, request, *args, **kwargs):
         applicants = UserJobApplied.objects.select_related('job', 'user').filter(job__company=request.user)
         applicant_details = []
@@ -678,6 +695,11 @@ class ShowAppliedUser(CompanyLoginRequiredMixin, View):
 
 
 class JobOpeningUpdate(CompanyLoginRequiredMixin, View):
+    """
+    This view is used to update the posted job of the logged-in company.
+    company -> object : It is an object which consist the information of particular job post
+    form1 -> form : It is used to update the details of that particular job post.
+    """
     def get(self, request, *args, **kwargs):
         company = JobOpenings.objects.filter(id=self.kwargs['pk']).first()
         form1 = UpdateJobOpenings(instance=company)
@@ -699,6 +721,12 @@ class JobOpeningUpdate(CompanyLoginRequiredMixin, View):
 
 
 class ShowAcceptedInterviewers(CompanyLoginRequiredMixin, View):
+    """
+    This view is used to show all that applicants whose interviews are not scheduled.
+    applicants -> objects : It is a collection of objects of UserInterview module.
+    job_application__job__company -> str : It is used in ORM to filter the resultant queryset for specific
+                                           logged-in company.
+    """
     def get(self, request, *args, **kwargs):
         applicants = UserInterview.objects.filter(Q(technical_round='Pending') | Q(HR_round='Pending'),
                                                   job_application__job__company=request.user)
@@ -706,6 +734,14 @@ class ShowAcceptedInterviewers(CompanyLoginRequiredMixin, View):
 
 
 class ScheduleApplicantInterview(CompanyLoginRequiredMixin, View):
+    """
+    This view is used for scheduling the interview of User.
+    form1 -> form : This form is used to fill the details for Scheduling Interview of Applicant.
+    pk -> int : This is used as a parameter which consist the ID of Applicant.
+    time_interview -> str : It holds the time slot of interview.
+    interview_type -> object : It is an object of type of interviewer.
+    date_interview -> str : It holds the date in str format of interview.
+    """
     def get(self, request, *args, **kwargs):
         form1 = ScheduleInterviews(request.GET)
         return render(request, 'user_login/technical_interview_form.html', {'form': form1, 'pk': kwargs.get('pk')})
@@ -756,6 +792,11 @@ class ScheduleApplicantInterview(CompanyLoginRequiredMixin, View):
 
 @method_decorator(csrf_exempt, name='dispatch')
 class InterviewType(View):
+    """
+    This is an extra view which is specially created for AJAX.
+    type_interview_id -> int : It is an id of interviewer type using which available interviewer of specific type in
+                               logged-in company are differentiated.
+    """
     def post(self, request, *args, **kwargs):
         request_data = request.read()
         form_data = json.loads(request_data.decode('utf-8'))
@@ -773,6 +814,14 @@ class InterviewType(View):
 
 @method_decorator(csrf_exempt, name='dispatch')
 class GetTimeSlot(View):
+    """
+    This is an extra view which is specially created for AJAX using which available time slots are
+    searched and returned to the html.
+    interviewer -> object : It consists the object of interviewer.
+    sch_date -> str : It consists the chose date of interview.
+    applicant -> int : It consists the id of user.
+    final_time_slot -> list : It is a list of available time slots for user.
+    """
     def post(self, request, *args, **kwargs):
         time_slots = ['09:00–09:30', '10:00–10:30', '11:00–11:30', '12:00–12:30', '13:00–13:30',
                       '14:00–14:30', '15:00–15:30', '16:00–16:30', '17:00–17:30']
@@ -794,6 +843,11 @@ class GetTimeSlot(View):
 
 
 class ShowInterviewerScheduled(InterviewerLoginRequiredMixin, View):
+    """
+    This view is used by the interviewer to display the scheduled Interviews.
+    interviewer -> object : It holds the object of logged-in Interviewer.
+    interview_schedule -> objects : It is a collection of objects which consists the schedules of Interviewer.
+    """
     def get(self, request, *args, **kwargs):
         interviewer = InterviewerDetails.objects.get(interviewer=request.user)
         interview_schedule = Interview.objects.filter(interviewer=interviewer)
@@ -801,6 +855,12 @@ class ShowInterviewerScheduled(InterviewerLoginRequiredMixin, View):
 
 
 class ApplicantDetails(InterviewerLoginRequiredMixin, View):
+    """
+    This view is used to See the Applicant Details and job details
+    applicant_details -> object : It holds the object of UserInterview module.
+    user_details -> object : It holds the all the details of User.
+    job_application -> object : It holds the details about job post for which user have applied.
+    """
     def get(self, request, *args, **kwargs):
         applicant_details = UserInterview.objects.get(id=kwargs['pk'])
         user_details = UserDetails.objects.select_related('user').get(user_id=applicant_details.job_application.user_id)
@@ -810,6 +870,10 @@ class ApplicantDetails(InterviewerLoginRequiredMixin, View):
 
 
 class ShowDetailSchedule(UserLoginRequiredMixin, View):
+    """
+    This view is used to see the detail schedule of Application.
+    user_interview -> object : It is an object of UserInterview module which consists the details of Interview.
+    """
     def get(self, request, *args, **kwargs):
         user_interview = UserInterview.objects.get(job_application_id=kwargs['pk'])
         interviews = Interview.objects.filter(application=user_interview)
@@ -817,6 +881,11 @@ class ShowDetailSchedule(UserLoginRequiredMixin, View):
 
 
 class DetailsInterviewer(UserLoginRequiredMixin, View):
+    """
+    This view is used to see the details of Interviewer.
+    interviewer_detail -> object : It is an object which holds the data about Interviewer.
+    company_name -> object : It holds the data of Interviewer and Company relation.
+    """
     def get(self, request, *args, **kwargs):
         interviewer_detail = InterviewerDetails.objects.get(id=kwargs['pk'])
         company_name = InterviewerCompany.objects.get(interviewer_id=interviewer_detail.interviewer.id)
@@ -825,24 +894,40 @@ class DetailsInterviewer(UserLoginRequiredMixin, View):
 
 
 class UserMessage(UserLoginRequiredMixin, View):
+    """
+    This view is used to display the messages for logged-in user.
+    messages -> objects : It is a collection of objects which consists the notifications.
+    """
     def get(self, request, *args, **kwargs):
         messages = Notification.objects.filter(receiver=request.user)
         return render(request, 'user_login/user_messages.html', {'messages': messages})
 
 
 class InterviewerMessage(InterviewerLoginRequiredMixin, View):
+    """
+    This view is used to display the messages for logged-in Interviewer.
+    messages -> objects : It is a collection of objects which consists the notifications.
+    """
     def get(self, request, *args, **kwargs):
         messages = Notification.objects.filter(receiver=request.user)
         return render(request, 'user_login/interviewer_messages.html', {'messages': messages})
 
 
 class CompanyMessage(CompanyLoginRequiredMixin, View):
+    """
+    This view is used to display the messages for logged-in company.
+    messages -> objects : It is a collection of objects which consists the notifications.
+    """
     def get(self, request, *args, **kwargs):
         messages = Notification.objects.filter(receiver=request.user)
         return render(request, 'user_login/company_messages.html', {'messages': messages})
 
 
 class UserFeedbackView(UserLoginRequiredMixin, View):
+    """
+    This view is used by the user to provide the feedback to the interviewer.
+    interviewer_feedback -> object : It is an object which consists the data related to feedback of Interviewer.
+    """
     def get(self, request, *args, **kwargs):
         interviewer = InterviewerDetails.objects.get(id=kwargs['pk'])
         return render(request, 'user_login/user_feedback.html',
@@ -863,6 +948,10 @@ class UserFeedbackView(UserLoginRequiredMixin, View):
 
 
 class FeedbackOfInterviewer(InterviewerLoginRequiredMixin, View):
+    """
+    This view is used by the interviewer to provide the feedback to the User.
+    user_process -> object : It is an object which consists the data related to feedback of User.
+    """
     def get(self, request, *args, **kwargs):
         application = UserInterview.objects.get(id=kwargs['pk'])
         form = UserFeedbackByInterviewer
@@ -896,6 +985,10 @@ class FeedbackOfInterviewer(InterviewerLoginRequiredMixin, View):
 
 
 class RescheduleRequest(UserLoginRequiredMixin, View):
+    """
+    This view is used for creating request of Reschedule.
+    request_rescheduling -> object : It is an object of reschedule request with reason.
+    """
     def get(self, request, *args, **kwargs):
         return render(request, 'user_login/reschedule_request.html',
                       {'user': request.user, 'application': kwargs['pk']})
@@ -912,6 +1005,10 @@ class RescheduleRequest(UserLoginRequiredMixin, View):
 
 
 class ShowRescheduleRequests(CompanyLoginRequiredMixin, View):
+    """
+    This view is showing the request of the rescheduling to the company.
+    reschedule -> objects : It is a collection of objects of RescheduleRequests model.
+    """
     def get(self, request, *args, **kwargs):
         reschedule = RescheduleRequests.objects.filter(
             interview_application_id__application__job_application__job__company=request.user, is_rescheduled=False)
