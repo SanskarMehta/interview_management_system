@@ -375,12 +375,6 @@ class JobListsApply(UserLoginRequiredMixin, View):
         return render(request, 'user_login/job_lists.html', {'job_lists': job_lists})
 
 
-# class AfterJobApply(LoginRequiredMixin, View):
-#     def get(self, request, *args, **kwargs):
-#         username = request.user.username
-#         return render(request, 'user_login/after_apply.html', {'Username': username})
-
-
 class UserChangePassword(UserLoginRequiredMixin, View):
     """
     This view is used to change the password of user.
@@ -1016,6 +1010,12 @@ class ShowRescheduleRequests(CompanyLoginRequiredMixin, View):
 
 
 class PostInterviewProcess(InterviewerLoginRequiredMixin, View):
+    """
+    This view is used by the Interviewer to submit the result of Applicant after Interview.
+    interviewer -> object : It is an object of details of Interviewer.
+    interviews -> objects : It is a collection of objects of applicants whose interview are
+                            already scheduled.
+    """
     def get(self, request, *args, **kwargs):
         interviewer = InterviewerDetails.objects.get(interviewer=request.user)
         if interviewer.type_interviewer_id == 4:
@@ -1030,6 +1030,9 @@ class PostInterviewProcess(InterviewerLoginRequiredMixin, View):
 
 
 class DeactivateAccount(View):
+    """
+    This view is used to deactivate the account of User , Company or Interviewer whoever is logged-in.
+    """
     def get(self, request, *args, **kwargs):
         CustomUser.objects.filter(id=kwargs['pk']).update(is_activated=False)
         logout(request)
@@ -1037,6 +1040,12 @@ class DeactivateAccount(View):
 
 
 class ReactivateAccount(View):
+    """
+    This view is used to reactivate the account of the user, Interviewer or Company.
+    email -> str : It holds the email for sending the url to reactivate the account.
+    domain -> str : It holds the domain name which one is added to the url.
+    url -> str : It is an url which is sent to the user for further process.
+    """
     def get(self, request, *args, **kwargs):
         return render(request, 'user_login/reactivate.html')
 
@@ -1050,6 +1059,12 @@ class ReactivateAccount(View):
 
 
 class ReactivationUser(View):
+    """
+    This view is used for verifying the user and authenticate that user before reactivating the account.
+    username -> str : It holds the username of the User/Company/Interviewer.
+    password -> str : It holds the password of the User/Company/Interviewer.
+    user_status -> object : It holds the object of authenticated user.
+    """
     def get(self, request, *args, **kwargs):
         return render(request, 'user_login/reactivation_page.html')
 
@@ -1067,12 +1082,25 @@ class ReactivationUser(View):
 
 
 class DetailInterviewScheduleShow(CompanyLoginRequiredMixin, View):
+    """
+    This view is used to check the schedule of Applicant's Interview.
+    interview -> object : It is an object which consist the details of Interview.
+    """
     def get(self, request, *args, **kwargs):
         interview = Interview.objects.get(id=kwargs['pk'])
         return render(request, 'user_login/interview_details_application.html', {'interview': interview})
 
 
 class RescheduleUserInterview(CompanyLoginRequiredMixin, View):
+    """
+    This view show the all the details of the requested interview for reschedule.
+    form -> form : This form is used to Reschedule the date and time.
+    time_slot -> str : It holds the updated time of Interview.
+    date_interview -> str : It holds the updated date of Interview.
+    interview_application -> object : It holds the object of RescheduleRequest model which is used to update the status of is_rescheduled.
+    interview_reschedule -> object : It holds the object of Interview Model which is used to update the time and date.
+    interview_application.interview_application.id -> int : It is an int id using which exact object of Interview model is searched.
+    """
     def get(self, request, *args, **kwargs):
         interview_application = RescheduleRequests.objects.get(id=kwargs['pk'])
         interviewer = Interview.objects.get(id=interview_application.interview_application.id)
@@ -1109,6 +1137,14 @@ class RescheduleUserInterview(CompanyLoginRequiredMixin, View):
 
 @method_decorator(csrf_exempt, name='dispatch')
 class RescheduleGetTimeSlot(CompanyLoginRequiredMixin, View):
+    """
+    This is an extra view which is specially created for AJAX using which available time slots are
+    searched and returned to the html.
+    interviewer_id -> str : It consists the id of interviewer(InterviewerDetails model).
+    sch_date -> str : It consists the chose date of interview.
+    applicant -> int : It consists the id of user.
+    final_time_slot -> list : It is a list of available time slots for user.
+    """
     def post(self, request, *args, **kwargs):
         time_slots = ['09:00–09:30', '10:00–10:30', '11:00–11:30', '12:00–12:30', '13:00–13:30',
                       '14:00–14:30', '15:00–15:30', '16:00–16:30', '17:00–17:30']
@@ -1130,6 +1166,11 @@ class RescheduleGetTimeSlot(CompanyLoginRequiredMixin, View):
 
 
 class IsAcceptAsEmployee(CompanyLoginRequiredMixin, View):
+    """
+    This view is used by the company to update the Employment status.
+    applicants -> objects : It is a collection of objects of UserInterview model where user's
+                            technical_round and hr_round is accepted.
+    """
     def get(self, request, *args, **kwargs):
         applicants = UserInterview.objects.filter(job_application__job__company=request.user, HR_round='Accepted',
                                                   technical_round='Accepted', selection_status='Pending')
@@ -1137,6 +1178,10 @@ class IsAcceptAsEmployee(CompanyLoginRequiredMixin, View):
 
 
 class ScheduledUsersInterviewsDisplay(CompanyLoginRequiredMixin, View):
+    """
+    This view is used by the Company to see the scheduled interviews.
+    interviews -> objects : It is a collection of objects which holds the multiple Interview schedules with details.
+    """
     def get(self, request, *args, **kwargs):
         interviews = Interview.objects.filter(application__job_application__job__company=request.user)
         return render(request, 'user_login/Show_scheduled_interviews.html', {'interviews': interviews})
@@ -1144,6 +1189,13 @@ class ScheduledUsersInterviewsDisplay(CompanyLoginRequiredMixin, View):
 
 @method_decorator(csrf_exempt, name='dispatch')
 class CollectFinalStatus(CompanyLoginRequiredMixin, View):
+    """
+    This view is mainly used for AJAX related to updating the final employment status of Applicant.
+    application_id -> str : It is used to update the status of specific application.
+    data_value -> str : It is used for status whether user is selected as a employee or not.
+                        (1 for Accepted | 0 for Rejected)
+    notification_message -> str : It is a message which is used in mail to inform user the status of Employment.
+    """
     def post(self, request, *args, **kwargs):
         request_data = request.read()
         form_data = json.loads(request_data.decode('utf-8'))
@@ -1168,6 +1220,11 @@ class CollectFinalStatus(CompanyLoginRequiredMixin, View):
 
 
 class ShowFeedBackInterviewer(InterviewerLoginRequiredMixin, View):
+    """
+    This view is used by the interviewer to see the feedback provided by the user.
+    interviewer_feedback -> objects : It consists the details of feedback which are given to the
+                                      current logged-in Interviewer.
+    """
     def get(self, request, *args, **kwargs):
         interviewer_feedbacks = InterviewerFeedback.objects.filter(interviewer=request.user)
         return render(request, 'user_login/interviewer_feedbacks.html',
