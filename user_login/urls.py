@@ -28,7 +28,6 @@ urlpatterns = [
     path('company_add_interviewer/', CompanyAddInterviewer.as_view(), name='company-add-interviewer'),
     path('job_lists/', JobLists.as_view(), name='job-lists'),
     path('job_lists/<int:pk>', JobListsApply.as_view(), name='job-apply'),
-    # path('after_apply/', AfterJobApply.as_view(), name='after-apply'),
     path('user_change_password/', UserChangePassword.as_view(), name='user-change-password'),
     path('interviewer_change_password/', InterviewerChangePassword.as_view(), name='interviewer-change-password'),
     path('company_change_password/', CompanyChangePassword.as_view(), name='company-change-password'),

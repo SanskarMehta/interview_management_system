@@ -58,8 +58,8 @@ class UserLogin(View):
             password=request.POST['password'],
         )
         if user is not None:
-            if user.is_block == False:
-                if user.is_activated == True:
+            if not user.is_block:
+                if user.is_activated:
                     if user.is_interviewer:
                         login(request, user)
                         if user.is_first_time:
@@ -74,7 +74,7 @@ class UserLogin(View):
                         else:
                             messages.info(request,
                                           'Your company is not accepted from the admin side. You can login after accepted by admin.')
-                            return redirect('login')
+                            return render(request, 'user_login/login.html')
                     else:
                         login(request, user)
                         if user.is_first_time:
@@ -83,10 +83,10 @@ class UserLogin(View):
                             return redirect('user-home')
                 else:
                     messages.info(request, 'Your account is deactivated. Please reactivate your account. ')
-                    return redirect('login')
+                    return render(request, 'user_login/login.html')
             else:
                 messages.info(request, "Your account is blocked by admin. Please call on number : 129121####.")
-                return redirect('login')
+                return render(request, 'user_login/login.html')
         else:
             messages.info(request, 'You unable to login because credentials are not matching')
             return render(request, 'user_login/login.html')
@@ -111,10 +111,10 @@ class UserRegister(View):
         if password2 == password:
             if CustomUser.objects.filter(username=username).exists():
                 messages.info(request, 'Username is already is taken.')
-                return redirect('user-register')
+                return render(request, 'user_login/register.html')
             elif CustomUser.objects.filter(email=email).exists():
                 messages.info(request, 'Email is already exist.')
-                return redirect('user-register')
+                return render(request, 'user_login/register.html')
             else:
                 user = CustomUser.objects.create_user(username=username, email=email, password=password)
                 user.save()
@@ -180,6 +180,7 @@ class CompanyRegister(View):
                     admin_notification.save()
                 return redirect('login')
         else:
+            messages.info(request,'Your passwords are not matched.')
             return render(request, 'user_login/company_register.html')
 
 
@@ -203,7 +204,6 @@ class UserDetailsForm(UserLoginRequiredMixin, View):
         user_12th_marks = request.POST['marks_12th']
         user_CPI = request.POST['cpi']
         user_CV = request.FILES['cvfile']
-
         if float(user_10th_marks) <= 100 and float(user_12th_marks) <= 100 and float(user_CPI) <= 10:
             if user_CV.content_type == 'application/pdf' or user_CV.content_type == 'application/msword':
                 userdetails = UserDetails.objects.create(user=request.user, user_phone=user_phone,
@@ -276,13 +276,14 @@ class CompanyAddInterviewer(CompanyLoginRequiredMixin, View):
         email = request.POST['email']
         password = request.POST['password']
         password2 = request.POST['confirm_password']
+        company_name = request.user.username
         if password == password2:
             if CustomUser.objects.filter(username=username).exists():
                 messages.info(request, 'Username is already is taken.')
-                return redirect('company-add-interviewer')
+                return render(request, 'user_login/company_add_interviewer.html', {'company': company_name})
             elif CustomUser.objects.filter(email=email).exists():
                 messages.info(request, 'Email is already exist.')
-                return redirect('company-add-interviewer')
+                return render(request, 'user_login/company_add_interviewer.html', {'company': company_name})
             else:
                 interviewer = CustomUser.objects.create_user(username=username, password=password, email=email,
                                                              is_interviewer=True)
@@ -295,9 +296,7 @@ class CompanyAddInterviewer(CompanyLoginRequiredMixin, View):
                 return redirect('show-interviewers')
         else:
             messages.info(request, "Your password's are not matching so you unable to create account.")
-            return redirect('company-add-interviewer')
-        company = request.user.username
-        return render(request, 'user_login/company_add_interviewer.html', {'company': company})
+            return render(request, 'user_login/company_add_interviewer.html', {'company': company_name})
 
 
 class InterviewerDetailsForm(InterviewerLoginRequiredMixin, View):
@@ -528,6 +527,7 @@ class InterviewerProfile(InterviewerLoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         company_name = InterviewerCompany.objects.get(interviewer=request.user)
         interviewer_details = InterviewerDetails.objects.filter(interviewer=request.user)
+        print('herere')
         return render(request, 'user_login/interviewer_profile.html',
                       {'interviewer_details': interviewer_details, 'company': company_name.company.username})
 
@@ -785,7 +785,7 @@ class ScheduleApplicantInterview(CompanyLoginRequiredMixin, View):
 
 
 @method_decorator(csrf_exempt, name='dispatch')
-class InterviewType(View):
+class InterviewType(CompanyLoginRequiredMixin,View):
     """
     This is an extra view which is specially created for AJAX.
     type_interview_id -> int : It is an id of interviewer type using which available interviewer of specific type in
