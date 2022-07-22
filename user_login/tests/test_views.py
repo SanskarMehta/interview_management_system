@@ -399,7 +399,7 @@ class TestCompanyAddInterviewer:
     def test_can_page_post_register_same_name_interviewer(self, client, test_company_loggedin):
         user = test_company_loggedin
         response = client.post(reverse('company-add-interviewer'),
-                               data={'username': 'Sanskar1234', 'email': 'sanskar36393@gmail.com',
+                               data={'username': 'Sanskar123456789', 'email': 'sanskar36393@gmail.com',
                                      'password': 'test@123', 'confirm_password': 'test@123'})
         assert response.status_code == 200
         messages = list(response.context['messages'])
@@ -423,7 +423,8 @@ class TestInterviewerDetailsForm:
         assert response.status_code == 403
 
     @pytest.mark.django_db
-    def test_interviewer_details_form_post(self, test_interviewer_loggedin_without_details, test_interviewer_type, client):
+    def test_interviewer_details_form_post(self, test_interviewer_loggedin_without_details, test_interviewer_type,
+                                           client):
         user = test_interviewer_loggedin_without_details
         interviewer_type = test_interviewer_type.type
         response = client.post(reverse('interviewer-details-form'),
@@ -453,10 +454,10 @@ class TestJobLists:
 class TestJobListsApply:
 
     @pytest.mark.django_db
-    def test_home_interviewer_get(self, test_user_loggedin, client , test_company_job_openings):
+    def test_home_interviewer_get(self, test_user_loggedin, client, test_company_job_openings):
         user = test_user_loggedin
         job_id = test_company_job_openings.id
-        response = client.get(reverse('job-apply',kwargs={'pk':job_id}))
+        response = client.get(reverse('job-apply', kwargs={'pk': job_id}))
         assert response.status_code == 200
         assertTemplateUsed(response, 'user_login/after_apply.html')
 
@@ -464,7 +465,7 @@ class TestJobListsApply:
     def test_home_user_get(self, test_interviewer_loggedin, client, test_company_job_openings):
         user = test_interviewer_loggedin
         job_id = test_company_job_openings.id
-        response = client.get(reverse('job-apply',kwargs={'pk':job_id}))
+        response = client.get(reverse('job-apply', kwargs={'pk': job_id}))
         print(response)
         assert response.status_code == 403
 
@@ -487,14 +488,16 @@ class TestUserChangePassword:
     @pytest.mark.django_db
     def test_user_password_change(self, test_user_loggedin, client):
         user = test_user_loggedin
-        response = client.post(reverse('user-change-password'),data={'new_password':'test@111','password2':'test@111','old_password':'test@123'})
+        response = client.post(reverse('user-change-password'),
+                               data={'new_password': 'test@111', 'password2': 'test@111', 'old_password': 'test@123'})
         assert response.status_code == 302
         assertRedirects(response, '/user_password_changed/')
 
     @pytest.mark.django_db
     def test_user_password_change_not_same_password(self, test_user_loggedin, client):
         user = test_user_loggedin
-        response = client.post(reverse('user-change-password'),data={'new_password':'test@111','password2':'test@1112','old_password':'test@123'})
+        response = client.post(reverse('user-change-password'),
+                               data={'new_password': 'test@111', 'password2': 'test@1112', 'old_password': 'test@123'})
         assert response.status_code == 200
         messages = list(response.context['messages'])
         assert len(messages) == 1
@@ -504,7 +507,8 @@ class TestUserChangePassword:
     def test_user_password_change_invalid_password(self, test_user_loggedin, client):
         user = test_user_loggedin
         response = client.post(reverse('user-change-password'),
-                               data={'new_password': 'test@111', 'password2': 'test@111', 'old_password': 'test@12345677'})
+                               data={'new_password': 'test@111', 'password2': 'test@111',
+                                     'old_password': 'test@12345677'})
         assert response.status_code == 200
         messages = list(response.context['messages'])
         assert len(messages) == 1
@@ -529,14 +533,16 @@ class TestCompanyChangePassword:
     @pytest.mark.django_db
     def test_company_password_change(self, test_company_loggedin, client):
         user = test_company_loggedin
-        response = client.post(reverse('company-change-password'),data={'new_password':'test@111','password2':'test@111','old_password':'test@123'})
+        response = client.post(reverse('company-change-password'),
+                               data={'new_password': 'test@111', 'password2': 'test@111', 'old_password': 'test@123'})
         assert response.status_code == 302
         assertRedirects(response, '/company_password_changed/')
 
     @pytest.mark.django_db
     def test_company_password_change_not_same_password(self, test_company_loggedin, client):
         user = test_company_loggedin
-        response = client.post(reverse('company-change-password'),data={'new_password':'test@111','password2':'test@1112','old_password':'test@123'})
+        response = client.post(reverse('company-change-password'),
+                               data={'new_password': 'test@111', 'password2': 'test@1112', 'old_password': 'test@123'})
         assert response.status_code == 200
         messages = list(response.context['messages'])
         assert len(messages) == 1
@@ -546,7 +552,8 @@ class TestCompanyChangePassword:
     def test_company_password_change_invalid_password(self, test_company_loggedin, client):
         user = test_company_loggedin
         response = client.post(reverse('company-change-password'),
-                               data={'new_password': 'test@111', 'password2': 'test@111', 'old_password': 'test@12345677'})
+                               data={'new_password': 'test@111', 'password2': 'test@111',
+                                     'old_password': 'test@12345677'})
         assert response.status_code == 200
         messages = list(response.context['messages'])
         assert len(messages) == 1
@@ -612,7 +619,14 @@ class TestCompanyCareer:
         user = test_interviewer_loggedin
         response = client.get(reverse('company-career'))
         assert response.status_code == 403
-#### Write test case for delete AJAX####
+
+    @pytest.mark.django_db
+    def test_company_career(self, test_company_loggedin, test_delete_company_job_opening,client):
+        user = test_company_loggedin
+        job_id = test_delete_company_job_opening
+        response = client.delete(reverse('company-career'),data={'job_id':job_id},content_type='application/json',
+                               HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        assert response.status_code == 200
 
 
 class TestUserAppliedJobs:
@@ -654,8 +668,7 @@ class TestInterviewerProfile:
         user = test_interviewer_company_details_loggedin
         response = client.get(reverse('interviewer-profile'))
         assert response.status_code == 200
-        assertTemplateUsed(response,'user_login/interviewer_profile.html')
-
+        assertTemplateUsed(response, 'user_login/interviewer_profile.html')
 
     @pytest.mark.django_db
     def test_home_user_get(self, test_user_loggedin, client):
@@ -677,7 +690,14 @@ class TestShowInterviewers:
         user = test_interviewer_loggedin
         response = client.get(reverse('show-interviewers'))
         assert response.status_code == 403
-#### Write test case for delete AJAX####
+
+    @pytest.mark.django_db
+    def test_company_interviewer(self, test_company_loggedin, test_delete_interviewer, client):
+        user = test_company_loggedin
+        interviewer_id = test_delete_interviewer
+        response = client.delete(reverse('show-interviewers'), data={'interviewer_id': interviewer_id}, content_type='application/json',
+                                 HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        assert response.status_code == 200
 
 
 class TestUpdateUserDetails:
@@ -698,9 +718,9 @@ class TestUpdateUserDetails:
     @pytest.mark.django_db
     def test_user_update_details_post(self, client, test_user_with_details_loggedin):
         user = test_user_with_details_loggedin
-        response = client.post(reverse('user-update-profile'),data={'user_12th_marks':98,'user_10th_marks':76})
+        response = client.post(reverse('user-update-profile'), data={'user_12th_marks': 98, 'user_10th_marks': 76})
         assert response.status_code == 302
-        assertRedirects(response,'/user_update_profile/')
+        assertRedirects(response, '/user_update_profile/')
 
 
 class TestUpdateInterviewerDetails:
@@ -721,9 +741,9 @@ class TestUpdateInterviewerDetails:
     @pytest.mark.django_db
     def test_interviewer_update_details_post(self, client, test_interviewer_with_details_loggedin):
         user = test_interviewer_with_details_loggedin
-        response = client.post(reverse('interviewer-update-profile'),data={'interviewer_technology':'Python'})
+        response = client.post(reverse('interviewer-update-profile'), data={'interviewer_technology': 'Python'})
         assert response.status_code == 302
-        assertRedirects(response,'/interviewer_update_profile/')
+        assertRedirects(response, '/interviewer_update_profile/')
 
 
 class TestShowAppliedUser:
@@ -743,14 +763,15 @@ class TestShowAppliedUser:
 
     @pytest.mark.django_db
     def test_show_applied_user_with_accepted(self, test_user_job_applied, client):
-        user,job_id = test_user_job_applied
-        response = client.post(reverse('company-applicants'),data={'user_applied_job_id':job_id,'data_status':'0'})
+        user, job_id = test_user_job_applied
+        response = client.post(reverse('company-applicants'), data={'user_applied_job_id': job_id, 'data_status': '0'})
         assert response.status_code == 200
-        assertJSONEqual(str(response.content, encoding='utf8'),expected_data={'success': True, 'message': 'Interviewer Deleted Successfully'})
+        assertJSONEqual(str(response.content, encoding='utf8'),
+                        expected_data={'success': True, 'message': 'Interviewer Deleted Successfully'})
 
     @pytest.mark.django_db
     def test_show_applied_user_with_rejected(self, test_user_job_applied, client):
-        user,job_id = test_user_job_applied
+        user, job_id = test_user_job_applied
         response = client.post(reverse('company-applicants'), data={'user_applied_job_id': job_id, 'data_status': '1'})
         assert response.status_code == 200
         assertJSONEqual(str(response.content, encoding='utf8'),
@@ -760,36 +781,38 @@ class TestShowAppliedUser:
 class TestJobOpeningUpdate:
 
     @pytest.mark.django_db
-    def test_home_interviewer_get(self, test_company_loggedin, test_company_job_openings,client):
+    def test_home_interviewer_get(self, test_company_loggedin, test_company_job_openings, client):
         user = test_company_loggedin
         job_id = test_company_job_openings.id
-        response = client.get(reverse('update-job',kwargs={'pk':job_id}))
+        response = client.get(reverse('update-job', kwargs={'pk': job_id}))
         assert response.status_code == 200
         assertTemplateUsed(response, 'user_login/company_job_openings_update.html')
 
     @pytest.mark.django_db
-    def test_home_user_get(self, test_interviewer_loggedin, test_company_job_openings,client):
+    def test_home_user_get(self, test_interviewer_loggedin, test_company_job_openings, client):
         user = test_interviewer_loggedin
         job_id = test_company_job_openings.id
-        response = client.get(reverse('update-job',kwargs={'pk':job_id}))
+        response = client.get(reverse('update-job', kwargs={'pk': job_id}))
         assert response.status_code == 403
 
-
     @pytest.mark.django_db
-    def test_home_update_job_post(self, test_company_loggedin, test_company_job_openings,client):
+    def test_home_update_job_post(self, test_company_loggedin, test_company_job_openings, client):
         user = test_company_loggedin
         job_id = test_company_job_openings.id
-        response = client.post(reverse('update-job',kwargs={'pk':job_id}),data={'job_location':'Ahmedabad','description':'We required a experience developer who have min exp 3+ yrs','job_role':'Python Developer'})
+        response = client.post(reverse('update-job', kwargs={'pk': job_id}), data={'job_location': 'Ahmedabad',
+                                                                                   'description': 'We required a experience developer who have min exp 3+ yrs',
+                                                                                   'job_role': 'Python Developer'})
         assert response.status_code == 302
-        assertRedirects(response,'/career/')
+        assertRedirects(response, '/career/')
 
     @pytest.mark.django_db
-    def test_home_update_job_invalid(self, test_company_loggedin, test_company_job_openings,client):
+    def test_home_update_job_invalid(self, test_company_loggedin, test_company_job_openings, client):
         user = test_company_loggedin
         job_id = test_company_job_openings.id
-        response = client.post(reverse('update-job',kwargs={'pk':job_id}),data={'job_location':'Ahmedabad','job_role':'Python Developer'})
+        response = client.post(reverse('update-job', kwargs={'pk': job_id}),
+                               data={'job_location': 'Ahmedabad', 'job_role': 'Python Developer'})
         assert response.status_code == 200
-        assertTemplateUsed(response,'user_login/company_job_openings_update.html')
+        assertTemplateUsed(response, 'user_login/company_job_openings_update.html')
 
 
 class TestShowAcceptedInterviewers:
@@ -811,25 +834,27 @@ class TestShowAcceptedInterviewers:
 class TestScheduleApplicantInterview:
 
     @pytest.mark.django_db
-    def test_home_interviewer_get(self, test_use_interview_company,client):
+    def test_home_interviewer_get(self, test_use_interview_company, client):
         user_interview, company = test_use_interview_company
-        response = client.get(reverse('technical-interview',kwargs={'pk':user_interview.id}))
+        response = client.get(reverse('technical-interview', kwargs={'pk': user_interview.id}))
         assert response.status_code == 200
         assertTemplateUsed(response, 'user_login/technical_interview_form.html')
 
     @pytest.mark.django_db
-    def test_home_interviewer_home(self, test_user_loggedin,client):
+    def test_home_interviewer_home(self, test_user_loggedin, client):
         company = test_user_loggedin
-        response = client.get(reverse('technical-interview',kwargs={'pk':1}))
+        response = client.get(reverse('technical-interview', kwargs={'pk': 1}))
         assert response.status_code == 403
 
     @pytest.mark.django_db
-    def test_home_interviewer_schedule_post(self, test_use_interview_company, test_interviewer_details,client):
+    def test_home_interviewer_schedule_post(self, test_use_interview_company, test_interviewer_details, client):
         user_interview, company = test_use_interview_company
         interviewer = test_interviewer_details
-        response = client.post(reverse('technical-interview',kwargs={'pk':user_interview.id}),data={'type_interview':interviewer.type_interviewer.id,'interview_date':'10/11/2022','interviewer':interviewer.interviewer_id,'interview_time':'9:30-10:30'})
+        response = client.post(reverse('technical-interview', kwargs={'pk': user_interview.id}),
+                               data={'type_interview': interviewer.type_interviewer.id, 'interview_date': '10/11/2022',
+                                     'interviewer': interviewer.interviewer_id, 'interview_time': '9:30-10:30'})
         assert response.status_code == 302
-        assertRedirects(response,'/show_accepted_applicants/')
+        assertRedirects(response, '/show_accepted_applicants/')
 
 
 class TestInterviewType:
@@ -838,8 +863,9 @@ class TestInterviewType:
     def test_interviewer_type_ajax_post(self, client, test_company_loggedin, test_interviewer_type):
         user = test_company_loggedin
         interviewer_type = test_interviewer_type
-        response = client.post(reverse('get-interviewer'),data={'type_interview_id':interviewer_type.id},content_type='application/json',
-    HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        response = client.post(reverse('get-interviewer'), data={'type_interview_id': interviewer_type.id},
+                               content_type='application/json',
+                               HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         assert response.status_code == 200
 
 
@@ -848,9 +874,11 @@ class TestGetTimeSlot:
     @pytest.mark.django_db
     def test_interviewer_type_ajax_post(self, client, test_company_loggedin, test_interview_get_time_slot):
         user = test_company_loggedin
-        application_id,interviewer_id = test_interview_get_time_slot
-        response = client.post(reverse('get-time-slot'),data={'interviewer_id':interviewer_id,'sch_date':'10/11/2022','applicant_id':application_id},content_type='application/json',
-    HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        application_id, interviewer_id = test_interview_get_time_slot
+        response = client.post(reverse('get-time-slot'),
+                               data={'interviewer_id': interviewer_id, 'sch_date': '10/11/2022',
+                                     'applicant_id': application_id}, content_type='application/json',
+                               HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         assert response.status_code == 200
 
 
@@ -859,21 +887,21 @@ class TestShowInterviewerScheduled:
     @pytest.mark.django_db
     def test_home_show_interviewer_schedule(self, client, test_interviewer_details):
         user = test_interviewer_details
-        response2 = client.login(username=user.interviewer.username,password='test@123')
+        response2 = client.login(username=user.interviewer.username, password='test@123')
         response = client.get(reverse('show-interviewer-scheduled'))
         assert response.status_code == 200
-        assertTemplateUsed(response,'user_login/interviewer_schedule.html')
+        assertTemplateUsed(response, 'user_login/interviewer_schedule.html')
 
 
 class TestApplicantDetails:
 
     @pytest.mark.django_db
-    def test_home_show_interviewer_schedule(self, client, test_interviewer_loggedin,test_interview_get_time_slot):
+    def test_home_show_interviewer_schedule(self, client, test_interviewer_loggedin, test_interview_get_time_slot):
         user = test_interviewer_loggedin
-        user_interview_id , interviewer_id = test_interview_get_time_slot
-        response = client.get(reverse('applicant_details',kwargs={'pk':user_interview_id}))
+        user_interview_id, interviewer_id = test_interview_get_time_slot
+        response = client.get(reverse('applicant_details', kwargs={'pk': user_interview_id}))
         assert response.status_code == 200
-        assertTemplateUsed(response,'user_login/application_details.html')
+        assertTemplateUsed(response, 'user_login/application_details.html')
 
 
 class TestShowDetailSchedule:
@@ -881,10 +909,10 @@ class TestShowDetailSchedule:
     @pytest.mark.django_db
     def test_home_show_detail_schedule_get(self, test_use_interview_company, test_user_loggedin, client):
         user = test_user_loggedin
-        application_id , company = test_use_interview_company
-        response = client.get(reverse('detail-schedule' , kwargs={'pk':application_id.job_application_id}))
+        application_id, company = test_use_interview_company
+        response = client.get(reverse('detail-schedule', kwargs={'pk': application_id.job_application_id}))
         assert response.status_code == 200
-        assertTemplateUsed(response,'user_login/detail_interview_schedule.html')
+        assertTemplateUsed(response, 'user_login/detail_interview_schedule.html')
 
 
 class TestDetailsInterviewer:
@@ -893,9 +921,9 @@ class TestDetailsInterviewer:
     def test_home_details_interviewer(self, test_user_loggedin, test_interviewer_details, client):
         interviewer = test_interviewer_details
         user = test_user_loggedin
-        response = client.get(reverse('interviewer-details',kwargs={'pk':interviewer.id}))
-        assert  response.status_code == 200
-        assertTemplateUsed(response,'user_login/interviewer_details.html')
+        response = client.get(reverse('interviewer-details', kwargs={'pk': interviewer.id}))
+        assert response.status_code == 200
+        assertTemplateUsed(response, 'user_login/interviewer_details.html')
 
 
 class TestUserMessage:
@@ -904,8 +932,8 @@ class TestUserMessage:
     def test_home_details_interviewer(self, test_user_loggedin, client):
         user = test_user_loggedin
         response = client.get(reverse('user-messages'))
-        assert  response.status_code == 200
-        assertTemplateUsed(response,'user_login/user_messages.html')
+        assert response.status_code == 200
+        assertTemplateUsed(response, 'user_login/user_messages.html')
 
 
 class TestInterviewerMessage:
@@ -914,8 +942,8 @@ class TestInterviewerMessage:
     def test_home_details_interviewer(self, test_interviewer_loggedin, client):
         user = test_interviewer_loggedin
         response = client.get(reverse('interviewer-messages'))
-        assert  response.status_code == 200
-        assertTemplateUsed(response,'user_login/interviewer_messages.html')
+        assert response.status_code == 200
+        assertTemplateUsed(response, 'user_login/interviewer_messages.html')
 
 
 class TestCompanyMessage:
@@ -942,7 +970,8 @@ class TestUserFeedbackView:
     def test_home_details_interviewer_feedback_user_post(self, test_user_loggedin, test_interviewer_details, client):
         interviewer = test_interviewer_details
         user = test_user_loggedin
-        response = client.post(reverse('user-feedback', kwargs={'pk': interviewer.id}),data={'feedback':"You need to improve alot."})
+        response = client.post(reverse('user-feedback', kwargs={'pk': interviewer.id}),
+                               data={'feedback': "You need to improve alot."})
         assert response.status_code == 302
         assertRedirects(response, '/job_applied/')
 
@@ -950,20 +979,22 @@ class TestUserFeedbackView:
 class TestFeedbackOfInterviewer:
 
     @pytest.mark.django_db
-    def test_home_interviewer_user_feedback_get(self, client, test_interviewer_loggedin,test_interview_get_time_slot):
+    def test_home_interviewer_user_feedback_get(self, client, test_interviewer_loggedin, test_interview_get_time_slot):
         user = test_interviewer_loggedin
-        user_interview_id , interviewer_id = test_interview_get_time_slot
-        response = client.get(reverse('post-interview',kwargs={'pk':user_interview_id}))
+        user_interview_id, interviewer_id = test_interview_get_time_slot
+        response = client.get(reverse('post-interview', kwargs={'pk': user_interview_id}))
         assert response.status_code == 200
-        assertTemplateUsed(response,'user_login/post_interview.html')
+        assertTemplateUsed(response, 'user_login/post_interview.html')
 
     @pytest.mark.django_db
-    def test_home_interviewer_user_feedback_post(self, client, test_interviewer_loggedin,test_interview_get_time_slot):
+    def test_home_interviewer_user_feedback_post(self, client, test_interviewer_loggedin, test_interview_get_time_slot):
         user = test_interviewer_loggedin
-        user_interview_id , interviewer_id = test_interview_get_time_slot
-        response = client.post(reverse('post-interview',kwargs={'pk':user_interview_id}),data={'application':user_interview_id,'user':'Sanskar12345667','marks':9,'feedback':'He is very nice developer','application_status':'Accepted'})
+        user_interview_id, interviewer_id = test_interview_get_time_slot
+        response = client.post(reverse('post-interview', kwargs={'pk': user_interview_id}),
+                               data={'application': user_interview_id, 'user': 'Sanskar12345667', 'marks': 9,
+                                     'feedback': 'He is very nice developer', 'application_status': 'Accepted'})
         assert response.status_code == 302
-        assertRedirects(response,'/post_interview_applications/')
+        assertRedirects(response, '/post_interview_applications/')
 
 
 class TestRescheduleRequest:
@@ -972,16 +1003,16 @@ class TestRescheduleRequest:
     def test_interview_reschedule_get(self, test_interview_reschedule_request, client, test_user_loggedin):
         user = test_user_loggedin
         application_id = test_interview_reschedule_request
-        response = client.get(reverse('reschedule-request',kwargs={'pk':application_id}))
+        response = client.get(reverse('reschedule-request', kwargs={'pk': application_id}))
         assert response.status_code == 200
-        assertTemplateUsed(response,'user_login/reschedule_request.html')
-
+        assertTemplateUsed(response, 'user_login/reschedule_request.html')
 
     @pytest.mark.django_db
     def test_interview_reschedule_post(self, test_interview_reschedule_request, client, test_user_loggedin):
         user = test_user_loggedin
         application_id = test_interview_reschedule_request
-        response = client.post(reverse('reschedule-request',kwargs={'pk':application_id}),data={'reschedule_reason':'ABCDEFEFEFCFC'})
+        response = client.post(reverse('reschedule-request', kwargs={'pk': application_id}),
+                               data={'reschedule_reason': 'ABCDEFEFEFCFC'})
         assert response.status_code == 302
 
 
@@ -992,7 +1023,7 @@ class TestShowRescheduleRequests:
         user = test_company_loggedin
         response = client.get(reverse('show-request-reschedule'))
         assert response.status_code == 200
-        assertTemplateUsed(response,'user_login/show_reschedule_request.html')
+        assertTemplateUsed(response, 'user_login/show_reschedule_request.html')
 
 
 class TestPostInterviewProcess:
@@ -1002,7 +1033,7 @@ class TestPostInterviewProcess:
         user = test_interviewer_loggedin
         response = client.get(reverse('post-interview-application'))
         assert response.status_code == 200
-        assertTemplateUsed(response,'user_login/post_interview_applicants.html')
+        assertTemplateUsed(response, 'user_login/post_interview_applicants.html')
 
 
 class TestDeactivateAccount:
@@ -1010,6 +1041,139 @@ class TestDeactivateAccount:
     @pytest.mark.django_db
     def test_home_interviewer_get(self, test_create_user, client):
         user = test_create_user
-        response = client.get(reverse('deactivate',kwargs={'pk':user.id}))
+        response = client.get(reverse('deactivate', kwargs={'pk': user.id}))
         assert response.status_code == 302
         assertRedirects(response, '/login/')
+
+
+class TestReactivateAccount:
+
+    @pytest.mark.django_db
+    def test_reactivate_account_get(self, client):
+        response = client.get(reverse('reactivate'))
+        assert response.status_code == 200
+        assertTemplateUsed(response, 'user_login/reactivate.html')
+
+    @pytest.mark.django_db
+    def test_reactivate_account_post(self, client):
+        response = client.post(reverse('reactivate'), data={'email': ''})
+        assert response.status_code == 302
+        assertRedirects(response, '/login/')
+
+
+class TestReactivationUser:
+
+    @pytest.mark.django_db
+    def test_reactivate_account_get(self, client):
+        response = client.get(reverse('reactivation'))
+        assert response.status_code == 200
+        assertTemplateUsed(response, 'user_login/reactivation_page.html')
+
+    @pytest.mark.django_db
+    def test_reactivate_account_post(self, test_create_user, client):
+        user = test_create_user
+        response = client.post(reverse('reactivation'), data={'username': user.username, 'password': 'test@123'})
+        assert response.status_code == 302
+        assertRedirects(response, '/login/')
+
+    @pytest.mark.django_db
+    def test_reactivate_account_post_invalid(self, test_create_user, client):
+        user = test_create_user
+        response = client.post(reverse('reactivation'), data={'username': user.username, 'password': 'test@1234'})
+        assert response.status_code == 200
+        messages = list(response.context['messages'])
+        assert len(messages) == 1
+        assert str(messages[0]) == 'Your credentials are invalid please enter right credentials.'
+
+
+class TestDetailInterviewScheduleShow:
+
+    @pytest.mark.django_db
+    def test_get_detail_interview_schedule_show(self, client, test_interview_reschedule_request, test_company_loggedin):
+        user = test_company_loggedin
+        interview_id = test_interview_reschedule_request
+        response = client.get(reverse('detail-interview-show',kwargs={'pk':interview_id}))
+        assert response.status_code == 200
+        assertTemplateUsed(response,'user_login/interview_details_application.html')
+
+
+class TestRescheduleUserInterview:
+
+    @pytest.mark.django_db
+    def test_reschedule_user_interview_get(self, test_company_loggedin, test_reschedule_request, client):
+        user = test_company_loggedin
+        reschedule_request = test_reschedule_request
+        response = client.get(reverse('reschedule-interview',kwargs={'pk':reschedule_request.id}))
+        assert response.status_code == 200
+        assertTemplateUsed(response,'user_login/reschedule_user_interview.html')
+
+
+    @pytest.mark.django_db
+    def test_reschedule_user_interview_post(self, test_company_loggedin, test_reschedule_request, client):
+        user = test_company_loggedin
+        reschedule_request = test_reschedule_request
+        response = client.post(reverse('reschedule-interview',kwargs={'pk':reschedule_request.id}),data={'date':'2022-10-11','interview_time':'09:00–09:30'})
+        assert response.status_code == 302
+        assertRedirects(response,'/show_requests_reschedule/')
+
+
+class TestRescheduleGetTimeSlot:
+
+    @pytest.mark.django_db
+    def test_reschedule_get_time_slot_post(self, client, test_company_loggedin, test_interview_get_time_slot):
+        user = test_company_loggedin
+        application_id, interviewer_id = test_interview_get_time_slot
+        response = client.post(reverse('get-reschedule-time-slot'),
+                               data={'interviewer_id': interviewer_id, 'sch_date': '2022-10-11',
+                                     'applicant_id': application_id}, content_type='application/json',
+                               HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        assert response.status_code == 200
+
+
+class TestIsAcceptAsEmployee:
+
+    @pytest.mark.django_db
+    def test_is_accept_as_employee(self, test_company_loggedin, client):
+        user = test_company_loggedin
+        response = client.get(reverse('accept-reject-applicant'))
+        assert response.status_code == 200
+        assertTemplateUsed(response,'user_login/show_all_applicants.html')
+
+
+class TestScheduledUsersInterviewsDisplay:
+
+    @pytest.mark.django_db
+    def test_is_accept_as_employee(self, test_company_loggedin, client):
+        user = test_company_loggedin
+        response = client.get(reverse('show-scheduled-interviews'))
+        assert response.status_code == 200
+        assertTemplateUsed(response,'user_login/Show_scheduled_interviews.html')
+
+
+class TestCollectFinalStatus:
+
+    @pytest.mark.django_db
+    def test_collect_final_status_rejected(self, client, test_use_interview_company):
+        application_id,user = test_use_interview_company
+        response = client.post(reverse('collect-final-status'),data={'application_id':application_id.id,'data_value':'0'},content_type='application/json',
+                               HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        assert response.status_code == 200
+
+    @pytest.mark.django_db
+    def test_collect_final_status_accepted(self, client, test_use_interview_company):
+        application_id, user = test_use_interview_company
+        response = client.post(reverse('collect-final-status'),
+                               data={'application_id': application_id.id, 'data_value': '1'},
+                               content_type='application/json',
+                               HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        assert response.status_code == 200
+
+
+class TestShowFeedBackInterviewer:
+
+    @pytest.mark.django_db
+    def test_show_feedback_interviewer_get(self, test_interviewer_loggedin, client):
+        user = test_interviewer_loggedin
+        response = client.get(reverse('feedback-of-interviewer'))
+        assert response.status_code == 200
+        assertTemplateUsed(response,'user_login/interviewer_feedbacks.html')

@@ -1078,7 +1078,8 @@ class ReactivationUser(View):
             user_status.save()
             return redirect('login')
         else:
-            return redirect('')
+            messages.info(request,'Your credentials are invalid please enter right credentials.')
+            return render(request, 'user_login/reactivation_page.html')
 
 
 class DetailInterviewScheduleShow(CompanyLoginRequiredMixin, View):

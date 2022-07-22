@@ -2,7 +2,7 @@ import pytest
 from django.urls import reverse
 
 from user_login.models import CustomUser, CompanyAcceptance, InterviewerType, JobOpenings, InterviewerCompany, \
-    UserDetails, InterviewerDetails, UserJobApplied, UserInterview, Interview
+    UserDetails, InterviewerDetails, UserJobApplied, UserInterview, Interview, RescheduleRequests
 
 
 @pytest.fixture
@@ -74,7 +74,7 @@ def test_interviewer_loggedin(db,client):
 
 @pytest.fixture
 def test_company_loggedin(db,client):
-    company = CustomUser.objects.create(username="Sanskar1234", email="sanskar3639@gmail.com",password="test@123",is_company=True)
+    company = CustomUser.objects.create(username="Sanskar123456789", email="sanskar3639@gmail.com",password="test@123",is_company=True)
     company.set_password(company.password)
     company.save()
     company_accepted = CompanyAcceptance.objects.create(company=company,is_accepted=True)
@@ -257,3 +257,47 @@ def test_interviewer_loggedin_without_details(db,client):
     u_login = client.login(username=user.username, password='test@123')
     assert u_login
     return u_login
+
+
+@pytest.fixture
+def test_reschedule_request(db, client):
+    user = CustomUser.objects.create(username='Sanskar1234', email='sanskar3639@gmail.com', password='test@123')
+    company = CustomUser.objects.create(username='sanskar_company', email='sanskar3639@gmail.com',
+                                        password='test@123',
+                                        is_company=True)
+    jobopenings = JobOpenings.objects.create(company=company, job_location='Remote', job_role='Python Developer',
+                                             description='We required a experience developer who have min exp of '
+                                                         '3+ yrs')
+    job_apply = UserJobApplied.objects.create(user=user, job=jobopenings)
+    user_interview = UserInterview.objects.create(job_application=job_apply)
+    interviewer = CustomUser.objects.create(username='Sanskar124', email='sanskar3639@gmail.com',
+                                            password='test@123',
+                                            is_interviewer=True)
+    interviewer_type = InterviewerType.objects.create(type='Data Scientist')
+    interviewer_details = InterviewerDetails.objects.create(interviewer=interviewer,
+                                                            type_interviewer=interviewer_type,
+                                                            interviewer_phone='832-049-8866',
+                                                            interviewer_technology='Python',
+                                                            job_role='Python Developer', Experience='3+ yrs')
+    interview = Interview.objects.create(application=user_interview, type_interview=interviewer_type,
+                                         interviewer=interviewer_details, interview_date='2022-11-11',
+                                         interview_time='09:00–09:30')
+    reschedule_request = RescheduleRequests.objects.create(interview_application=interview, user=user,
+                                                           reason="I unable to give interview on that day.")
+    return reschedule_request
+
+
+@pytest.fixture
+def test_delete_company_job_opening(db):
+    user = CustomUser.objects.create(username='Sanskar1234', email='sanskar3639@gmail.com', password='test@123',
+                                     is_company=True)
+    jobopenings = JobOpenings.objects.create(company=user, job_location='Remote', job_role='Python Developer',
+                                             description='We required a experience developer who have min exp of '
+                                                         '3+ yrs')
+    return jobopenings.id
+
+
+@pytest.fixture
+def test_delete_interviewer(db):
+    user = CustomUser.objects.create(username='Interviewer_1', email='int@gmail.com', password='test@123', is_interviewer=True)
+    return user.id

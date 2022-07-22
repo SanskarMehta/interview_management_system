@@ -245,31 +245,31 @@ class TestRescheduleRequests(object):
     """Test for RescheduleRequests model"""
 
     @pytest.mark.django_db
-    def test_field_value(self):
-        user = CustomUser.objects.create(username='Sanskar1234', email='sanskar3639@gmail.com', password='test@123')
-        company = CustomUser.objects.create(username='sanskar_company', email='sanskar3639@gmail.com',
-                                            password='test@123',
-                                            is_company=True)
-        jobopenings = JobOpenings.objects.create(company=company, job_location='Remote', job_role='Python Developer',
-                                                 description='We required a experience developer who have min exp of '
-                                                             '3+ yrs')
-        job_apply = UserJobApplied.objects.create(user=user, job=jobopenings)
-        user_interview = UserInterview.objects.create(job_application=job_apply)
-        interviewer = CustomUser.objects.create(username='Sanskar124', email='sanskar3639@gmail.com',
-                                                password='test@123',
-                                                is_interviewer=True)
-        interviewer_type = InterviewerType.objects.create(type='Data Scientist')
-        interviewer_details = InterviewerDetails.objects.create(interviewer=interviewer,
-                                                                type_interviewer=interviewer_type,
-                                                                interviewer_phone='832-049-8866',
-                                                                interviewer_technology='Python',
-                                                                job_role='Python Developer', Experience='3+ yrs')
-        interview = Interview.objects.create(application=user_interview, type_interview=interviewer_type,
-                                             interviewer=interviewer_details, interview_date='2022-11-11',
-                                             interview_time='09:00–09:30')
-        reschedule_request = RescheduleRequests.objects.create(interview_application=interview,user=user,reason="I unable to give interview on that day.")
+    def test_field_value(self,test_reschedule_request):
+        # user = CustomUser.objects.create(username='Sanskar1234', email='sanskar3639@gmail.com', password='test@123')
+        # company = CustomUser.objects.create(username='sanskar_company', email='sanskar3639@gmail.com',
+        #                                     password='test@123',
+        #                                     is_company=True)
+        # jobopenings = JobOpenings.objects.create(company=company, job_location='Remote', job_role='Python Developer',
+        #                                          description='We required a experience developer who have min exp of '
+        #                                                      '3+ yrs')
+        # job_apply = UserJobApplied.objects.create(user=user, job=jobopenings)
+        # user_interview = UserInterview.objects.create(job_application=job_apply)
+        # interviewer = CustomUser.objects.create(username='Sanskar124', email='sanskar3639@gmail.com',
+        #                                         password='test@123',
+        #                                         is_interviewer=True)
+        # interviewer_type = InterviewerType.objects.create(type='Data Scientist')
+        # interviewer_details = InterviewerDetails.objects.create(interviewer=interviewer,
+        #                                                         type_interviewer=interviewer_type,
+        #                                                         interviewer_phone='832-049-8866',
+        #                                                         interviewer_technology='Python',
+        #                                                         job_role='Python Developer', Experience='3+ yrs')
+        # interview = Interview.objects.create(application=user_interview, type_interview=interviewer_type,
+        #                                      interviewer=interviewer_details, interview_date='2022-11-11',
+        #                                      interview_time='09:00–09:30')
+        # reschedule_request = RescheduleRequests.objects.create(interview_application=interview,user=user,reason="I unable to give interview on that day.")
+        reschedule_request = test_reschedule_request
         reschedule_request_obj = RescheduleRequests.objects.all()
-        assert reschedule_request.interview_application == interview
         assert reschedule_request.reason == "I unable to give interview on that day."
         assert reschedule_request.is_rescheduled == False
 
