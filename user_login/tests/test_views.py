@@ -764,15 +764,15 @@ class TestShowAppliedUser:
     @pytest.mark.django_db
     def test_show_applied_user_with_accepted(self, test_user_job_applied, client):
         user, job_id = test_user_job_applied
-        response = client.post(reverse('company-applicants'), data={'user_applied_job_id': job_id, 'data_status': '0'})
+        response = client.post(reverse('company-applicants'), data={'user_applied_job_id': job_id, 'data-status': '0'})
         assert response.status_code == 200
         assertJSONEqual(str(response.content, encoding='utf8'),
                         expected_data={'success': True, 'message': 'Interviewer Deleted Successfully'})
 
     @pytest.mark.django_db
-    def test_show_applied_user_with_rejected(self, test_user_job_applied, client):
-        user, job_id = test_user_job_applied
-        response = client.post(reverse('company-applicants'), data={'user_applied_job_id': job_id, 'data_status': '1'})
+    def test_show_applied_user_with_rejected(self, test_user_job_applied_with_interview, client):
+        user, job_id = test_user_job_applied_with_interview
+        response = client.post(reverse('company-applicants'), data={'user_applied_job_id': job_id, 'data-status': '1'})
         assert response.status_code == 200
         assertJSONEqual(str(response.content, encoding='utf8'),
                         expected_data={'success': True, 'message': 'Interviewer Deleted Successfully'})

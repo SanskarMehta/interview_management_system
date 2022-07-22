@@ -301,3 +301,93 @@ def test_delete_company_job_opening(db):
 def test_delete_interviewer(db):
     user = CustomUser.objects.create(username='Interviewer_1', email='int@gmail.com', password='test@123', is_interviewer=True)
     return user.id
+
+
+@pytest.fixture
+def test_admin_login_post(db):
+    user = CustomUser.objects.create(username='admin', email='int@gmail.com', password='test@123', is_superuser=True)
+    user.set_password(user.password)
+    user.save()
+    return user
+
+
+@pytest.fixture
+def test_admin_loggedin(db, client):
+    user = CustomUser.objects.create(username='admin', email='int@gmail.com', password='test@123', is_superuser=True)
+    user.set_password(user.password)
+    user.save()
+    u_login = client.login(username=user.username, password='test@123')
+    return u_login
+
+
+@pytest.fixture
+def test_create_user_details(db):
+    user = CustomUser.objects.create(username="Sanskar1234", email="sanskar3639@gmail.com",password="test@123")
+    user.set_password(user.password)
+    user.save()
+    userdetails = UserDetails.objects.create(user=user, user_phone='832-049-8866', user_technology='python , dbms',
+                               user_12th_marks=98.9, user_10th_marks=96, user_CPI=8.87)
+    return userdetails
+
+
+@pytest.fixture
+def test_create_administrator(db):
+    user = CustomUser.objects.create(username='admin1',password='test@123',email='admin@gmail.com',is_superuser=True)
+    user.set_password(user.password)
+    user.save()
+    return user
+
+
+@pytest.fixture
+def test_interviewer_details_admin(db):
+    user = CustomUser.objects.create(username='Sanskar1234', email='sanskar3639@gmail.com', password='test@123',
+                                     is_interviewer=True)
+    interviewer_type = InterviewerType.objects.create(type='Data Scientist')
+    interviewer_details = InterviewerDetails.objects.create(interviewer=user, type_interviewer=interviewer_type,
+                                                            interviewer_phone='832-049-8866',
+                                                            interviewer_technology='Python',
+                                                            job_role='Python Developer', Experience='3+ yrs')
+    company = CustomUser.objects.create(username='Sanskar_company', email='sanskar3639@gmail.com',
+                                        password='test@123',
+                                        is_company=True)
+    interviewer_company = InterviewerCompany.objects.create(company=company, interviewer=user)
+    return interviewer_company,interviewer_details
+
+
+@pytest.fixture
+def test_admin_loggedin_with_details(db, client):
+    user = CustomUser.objects.create(username='admin', email='int@gmail.com', password='test@123', is_superuser=True)
+    user.set_password(user.password)
+    user.save()
+    user_details = UserDetails.objects.create(user=user, user_phone='832-049-8866', user_technology='python , dbms',
+                               user_12th_marks=98.9, user_10th_marks=96, user_CPI=8.87)
+    u_login = client.login(username=user.username, password='test@123')
+    return u_login,user.id
+
+
+@pytest.fixture
+def test_company_acceptance_admin(db):
+    user = CustomUser.objects.create(username='Sanskar1234', email='sanskar3639@gmail.com', password='test@123',
+                                     is_company=True)
+    company = CompanyAcceptance.objects.create(company=user)
+    return company.id
+
+
+@pytest.fixture
+def test_user_job_applied_with_interview(db,client):
+    user = CustomUser.objects.create(username="Sanskar1234", email="sanskar3639@gmail.com", password="test@123")
+    user.set_password(user.password)
+    user.save()
+    company = CustomUser.objects.create(username='sanskar_company', email='sanskar3639@gmail.com',
+                                        password='test@123',
+                                        is_company=True)
+    company.set_password(company.password)
+    company.save()
+    jobopenings = JobOpenings.objects.create(company=company, job_location='Remote', job_role='Python Developer',
+                                             description='We required a experience developer who have min exp of '
+                                                         '3+ yrs')
+    job_apply = UserJobApplied.objects.create(user=user, job=jobopenings)
+    user_interview = UserInterview.objects.create(job_application=job_apply,technical_round='Accepted',HR_round='Accepted')
+    u_login = client.login(username=company.username, password='test@123')
+    job_id = job_apply.id
+    return u_login,job_id

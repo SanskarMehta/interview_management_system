@@ -44,7 +44,7 @@ class AdminLogin(View):
                 return redirect('admin-after-login')
             else:
                 messages.info(request, "You unable to access this site.")
-                return redirect('admin-login')
+                return render(request, 'administration/login.html')
         messages.info(request, "You unable to access this site because your credentials are wrong.")
         return render(request, 'administration/login.html')
 
@@ -102,7 +102,7 @@ class DetailsOfUser(AdminLoginRequiredMixin, View):
         try:
             user_details = UserDetails.objects.get(user_id=kwargs['pk'])
             return render(request, 'administration/DetailsUser.html', {'user_detail': user_details})
-        except ObjectDoesNotExist:
+        except UserDetails.DoesNotExist:
             return render(request,'administration/errors/403.html')
 
 
@@ -121,7 +121,7 @@ class DetailsOfInterviewer(AdminLoginRequiredMixin, View):
             company_name = InterviewerCompany.objects.get(interviewer=interviewer_details.interviewer)
             return render(request, 'administration/DetailsInterviewer.html',
                           {'interviewer_detail': interviewer_details, 'company': company_name.company.username})
-        except ObjectDoesNotExist:
+        except InterviewerDetails.DoesNotExist:
             return render(request,'administration/errors/403.html')
 
 
@@ -145,10 +145,10 @@ class CompanyRegisterByAdmin(AdminLoginRequiredMixin, View):
         if password2 == password:
             if CustomUser.objects.filter(username=username).exists():
                 messages.info(request, 'Username is already is taken.')
-                return redirect('company-register-admin')
+                return render(request, 'administration/user_register.html')
             elif CustomUser.objects.filter(email=email).exists():
                 messages.info(request, 'Email is already exist.')
-                return redirect('company-register-admin')
+                return render(request, 'administration/user_register.html')
             else:
                 user = CustomUser.objects.create_user(username=username, email=email, password=password,
                                                       is_company=True)
@@ -184,10 +184,10 @@ class UserRegisterByAdmin(AdminLoginRequiredMixin, View):
         if password2 == password:
             if CustomUser.objects.filter(username=username).exists():
                 messages.info(request, 'Username is already is taken.')
-                return redirect('user-register-admin')
+                return render(request, 'administration/user_register.html')
             elif CustomUser.objects.filter(email=email).exists():
                 messages.info(request, 'Email is already exist.')
-                return redirect('user-register-admin')
+                return render(request, 'administration/user_register.html')
             else:
                 user = CustomUser.objects.create_user(username=username, email=email, password=password)
                 user.save()
@@ -232,11 +232,9 @@ class AdminUpdateUserDetails(AdminLoginRequiredMixin, View):
                 form.save()
                 if form2.is_valid():
                     form2.save()
-                    # messages.success(request,'Succefully Updated the Values and Email')
                     return redirect('admin-user-details', pk=request.user.id)
                 else:
-                    # messages.success(request,'Succefully Updated the Values')
-                    return redirect('user-profile')
+                    return redirect('admin-user-details', pk=request.user.id)
             else:
                 return redirect('admin-update-profile')
         except ObjectDoesNotExist:
