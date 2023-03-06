@@ -1,0 +1,24 @@
+{% extends 'user_login/base.html' %}
+{% block title %}Home{% endblock title %}
+{% block content %}
+    <p></p>
+    <h3 style="text-align:center;">Welcome to Interview Management System</h3>
+    <hr>
+    <div class="'container">
+        <div class="'row">
+            <div class="col-md-3"></div>
+            <div class="col-md-6">
+             <ul style="list-style-type:square;">
+                 <li><a href="{% url 'company-register' %}">Company Registration</a></li>
+                 <li><a href="{% url 'register' %}">User Registration</a></li>
+                 <li><a href="{% url 'reactivate' %}">Reactivate Account</a></li>
+                 <li><a href="{% url 'admin-home' %}">Admin</a></li>
+                 <li><a href="{% url 'login' %}">Login</a></li>
+                 <li><a href="{% url 'home' %}">Home <span class="sr-only">(current)</span></a></li>
+             </ul>
+            </div>
+            <div class="col-md-3"></div>
+            <hr>
+        </div>
+    </div>
+{% endblock content %}
