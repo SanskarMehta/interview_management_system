@@ -26,7 +26,7 @@ class HomeView(View):
     This is the first page with which user interacts first.
     """
     def get(self, request, *args, **kwargs):
-        return render(request, 'user_login/base.html')
+        return render(request, 'user_login/base_home.html')
 
 
 @method_decorator(never_cache, name='dispatch')
@@ -289,8 +289,10 @@ class CompanyAddInterviewer(CompanyLoginRequiredMixin, View):
                 interviewer.save()
                 interviewer_company = InterviewerCompany.objects.create(company=company, interviewer=interviewer)
                 interviewer_company.save()
-                email_message = 'Hiii \n I am sending your credentials of portal login and after login please fill your details and if you want then please change your password also.\nThank You.\n ID: ' + email + " Password: " + password + "."
-                send_mail('Interviewer Credentials', email_message, request.user.email, [email],
+                email_message = 'Hiii \n I am sending your credentials of portal login and after login please fill ' \
+                                'your details and if you want then please change your password also.\nThank You.\n ' \
+                                'ID: ' + username + " Password: " + password + "."
+                send_mail('Interviewer Credentials', email_message, os.getenv("EMAIL_USER"), [email],
                           fail_silently=False, )
                 return redirect('show-interviewers')
         else:
@@ -785,7 +787,7 @@ class ScheduleApplicantInterview(CompanyLoginRequiredMixin, View):
         message.save()
         user_email = application.job_application.user.email
         interviewer_email = interviewer.interviewer.email
-        send_mail(email_subject, email_message, request.user.email, [user_email, interviewer_email],
+        send_mail(email_subject, email_message, os.environ.get("EMAIL_USER"), [user_email, interviewer_email],
                   fail_silently=False, )
         return redirect('show-accepted-applicants')
 
@@ -1044,7 +1046,7 @@ class ReactivateAccount(View):
         email = request.POST['email']
         domain = request.build_absolute_uri('/')[:-1]
         url = f"{domain}/reactivate/user_info/"
-        send_mail('Reactivate Your Account', url, from_email=os.getenv('EMAIL_HOST_USER'), recipient_list=[email],
+        send_mail('Reactivate Your Account', url, from_email=os.getenv('EMAIL_USER'), recipient_list=[email],
                   fail_silently=False, )
         return redirect('login')
 
@@ -1163,7 +1165,7 @@ class CollectFinalStatus(CompanyLoginRequiredMixin, View):
         message = Notification.objects.create(sender=request.user, receiver=user.job_application.user,
                                               message=notification_message)
         message.save()
-        send_mail('Employment Status', notification_message, request.user.email, [user.job_application.user.email])
+        send_mail('Employment Status', notification_message, os.environ.get("EMAIL_USER"), [user.job_application.user.email])
         return JsonResponse({'message': messages})
 
 
